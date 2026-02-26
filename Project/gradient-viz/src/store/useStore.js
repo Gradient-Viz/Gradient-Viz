@@ -7,7 +7,7 @@ const useStore = create((set) => ({
     ascentProgress: 0,
 
     //Actions
-    setviewMode: (mode) => set({viewMode: mode}),
+    setViewMode: (mode) => set({viewMode: mode}),
     setPersonPosition: (pos) => set({personPosition: pos}),
     setShowAscentPath: (show) => set({showAscentPath: show}),
     setAscentProgress: (progress) => set({ascentProgress : progress}),

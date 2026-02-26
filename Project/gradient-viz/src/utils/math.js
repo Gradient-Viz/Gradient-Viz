@@ -2,7 +2,11 @@ const H = 0.0001;
 
 // z = f(x,y) = 2e^(-0.5(x^2 + y^2))
 export function f(x,y){
-    return 2.0 * Math.exp(-0.5 * (x*x+y*y));
+    //
+    // Math.sin(x) + Math.cos(y)
+    // 2.0 * Math.exp(-0.5 * (x*x+y*y))
+    // Math.sin(Math.sqrt(x*x + y*y))
+    return Math.sin(x) + Math.cos(y);
 }
 
 // calculating gradient
@@ -113,6 +117,29 @@ export function generateContours(levels, xMin = -3, xMax = 3, yMin = -3, yMax = 
     }));
 }
 
+export function autoContourLevels(xMin, xMax, yMin, yMax, numLevels = 9, sampleSteps = 50){
+    let fMin = Infinity;
+    let fMax = -Infinity;
+    const dx = (xMax - xMin) / sampleSteps;
+    const dy = (yMax - yMin) / sampleSteps;
+
+    for (let i = 0; i <= sampleSteps; i++){
+        for(let j = 0; j <= sampleSteps; j++){
+            const val = f(xMin + i *dx, yMin + j*dy);
+            if (val < fMin) fMin = val;
+            if (val > fMax) fMax = val; 
+        }
+    }
+
+    const levels = [];
+    const step = (fMax - fMin) / (numLevels + 1);
+    for(let k = 1; k <= numLevels; k++){
+        levels.push(fMin + k * step);
+    }
+    return levels;
+}
+
+
 export function gradientAscentPath(startX, startY, stepSize = 0.03, maxSteps = 600, tolerance = 0.001){
     const path = [[startX, startY]];
     let x = startX, y = startY;
@@ -122,8 +149,8 @@ export function gradientAscentPath(startX, startY, stepSize = 0.03, maxSteps = 6
         const mag = Math.sqrt(gx*gx + gy*gy);
         if (mag < tolerance) break;
         
-        x += (gx / mag) * stepSize;
-        y += (gy / mag) * stepSize;
+        x = Math.max(domainMIn, Math.min(domainMax, x));
+        x = Math.max(domainMIn, Math.min(domainMax, y));
         x = Math.max(-3, Math.min(3,x));
         y = Math.max(-3, Math.min(3,y));
         path.push([x, y]);
