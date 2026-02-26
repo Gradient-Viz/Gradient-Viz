@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import * as THREE from 'three';
 import { f } from '../utils/math';
-import { INFINITY } from "three/src/nodes/math/MathNode.js";
 
 const SIZE = 36;
 const SEGMENTS = 64;

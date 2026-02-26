@@ -13,7 +13,6 @@ function App() {
           <MountainSurface/>
           <ContourLines/>
           <OrbitControls/>
-
         </Canvas>
       </div>
   );
