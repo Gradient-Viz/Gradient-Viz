@@ -140,7 +140,7 @@ export function autoContourLevels(xMin, xMax, yMin, yMax, numLevels = 9, sampleS
 }
 
 
-export function gradientAscentPath(startX, startY, stepSize = 0.03, maxSteps = 600, tolerance = 0.001){
+export function gradientAscentPath(startX, startY, stepSize = 0.03, maxSteps = 600, tolerance = 0.001, domainMin = -18, domainMax = 18){
     const path = [[startX, startY]];
     let x = startX, y = startY;
 
@@ -149,10 +149,10 @@ export function gradientAscentPath(startX, startY, stepSize = 0.03, maxSteps = 6
         const mag = Math.sqrt(gx*gx + gy*gy);
         if (mag < tolerance) break;
         
-        x = Math.max(domainMIn, Math.min(domainMax, x));
-        x = Math.max(domainMIn, Math.min(domainMax, y));
-        x = Math.max(-3, Math.min(3,x));
-        y = Math.max(-3, Math.min(3,y));
+        x += (gx / mag) * stepSize;
+        y += (gy / mag) * stepSize;
+        x = Math.max(domainMin, Math.min(domainMax,x));
+        y = Math.max(domainMin, Math.min(domainMax,y));
         path.push([x, y]);
     }
     return path;
