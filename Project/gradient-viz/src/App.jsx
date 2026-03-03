@@ -12,7 +12,6 @@ function App() {
           <axesHelper args={[4]} />
           <MountainSurface/>
           <ContourLines/>
-          <OrbitControls/>
         </Canvas>
       </div>
   );

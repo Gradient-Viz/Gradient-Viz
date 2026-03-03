@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 const useStore = create((set) => ({
     // State
-    viewMode: '3d-explore',
+    viewMode: '3d_explore',
     personPosition: [1.0, 1.0],
     showAscentPath: false,
     ascentProgress: 0,
@@ -12,7 +12,7 @@ const useStore = create((set) => ({
     setShowAscentPath: (show) => set({showAscentPath: show}),
     setAscentProgress: (progress) => set({ascentProgress : progress}),
     reset: () => set({
-        viewMode: '3d-explore',
+        viewMode: '3d_explore',
         personPosition: [1.0, 1.0],
         showAscentPath: false,
         ascentProgress: 0,
