@@ -1,15 +1,39 @@
 const H = 0.0001;
 
-let _userFunction = (x,y) => (7*x*y)/(Math.exp**(x**2 + y**2));
+let _userFunction = (x,y) => (7*x*y)/ Math.exp(x**2 + y**2);
 
 // z = f(x,y) = 2e^(-0.5(x^2 + y^2))
 export function f(x,y){
     return _userFunction(x,y);
 }
 
+function mathToJS(expr){
+    let js = expr;
+    
+    const funcs = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'atan2',
+        'sqrt', 'abs', 'log', 'log2', 'log10', 'exp', 'floor', 'ceil', 'round', 'min', 
+        'max', 'pow'];
+    
+    for(const fn of funcs){
+        js = js.replace(new RegExp(`\\b${fn}\\b`, `g`), `Math.${fn}`);
+    }
+    // ^ to **
+    js = js.replace(/\^/g, '**');
+    // Math.pi to pi (symbol)
+    js = js.replace(/\bpi\b/gi, 'Math.PI');
+    js = js.replace(/π/g, 'Math.PI');
+
+    // Math.E to e
+    js = js.replace(/\be\b(?!x|y)/g, 'Math.E');
+    js = js.replace(/Math\.Math\./g, 'Math.');
+    return js;
+}
+
+
 export function setUserFunction(funcText){
     try{
-        const fn = new Function('x', 'y', `return ${funcText};`)
+        const jsText = mathToJS(funcText);
+        const fn = new Function('x', 'y', `return ${jsText};`)
         // test
         fn(0,0);
         _userFunction = fn;

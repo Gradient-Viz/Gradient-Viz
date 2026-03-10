@@ -65,7 +65,7 @@ export default function UIOverlay(){
     const reset = useStore((s) => s.reset);
     const incrementFunctionVersion = useStore((s) => s.incrementFunctionVersion);
 
-    const [funcText, setFuncText] = useState('Math.sin(x) + Math.cos(y)');
+    const [funcText, setFuncText] = useState('sin(x) + cos(y)');
     const [funcError, setFuncError] = useState(false);
 
     const handleFunctionChange = (e)  => {

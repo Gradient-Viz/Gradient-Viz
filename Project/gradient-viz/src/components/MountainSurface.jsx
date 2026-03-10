@@ -14,7 +14,6 @@ export default function MountainSurface() {
 
     const geometry = useMemo(() => {
         const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
-
         const pos = geo.attributes.position;
         const colors = new Float32Array(pos.count * 3);
 
@@ -30,9 +29,12 @@ export default function MountainSurface() {
             const x = pos.getX(i);
             const y = pos.getY(i);
             const z = f(x,y);  // Compute height
-            pos.setZ(i, z); 
+            
+            pos.setX(i, x);
+            pos.setY(i, z);
+            pos.setZ(i, y); 
 
-            const t = (z-fMin) / (fMax - fMin); // maps
+            const t = fMax > fMin ? (z-fMin) / (fMax - fMin): 0; // maps
             colors[i*3] =0.02 + t * 0.08; // R
             colors[i*3 + 1] =  0.05 + t * 0.15; // G
             colors[i*3 + 2] =  0.1  + t * 0.2; // B
@@ -45,7 +47,7 @@ export default function MountainSurface() {
     }, [domainMin, domainMax, gridLines, functionVersion]);
     // make y = z
     return (
-        <group rotation={[-Math.PI / 2, 0, 0]} geometry={geometry}>
+        <group>
             {/*Solid semi-trans surface */}
             <mesh geometry={geometry}>
                 <meshStandardMaterial
