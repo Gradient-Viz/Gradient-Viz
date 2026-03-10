@@ -1,15 +1,26 @@
 const H = 0.0001;
 
+let _userFunction = (x,y) => (7*x*y)/(Math.exp**(x**2 + y**2));
+
 // z = f(x,y) = 2e^(-0.5(x^2 + y^2))
 export function f(x,y){
-    //
-    // Math.sin(x) + Math.cos(y)
-    // 2.0 * Math.exp(-0.5 * (x*x+y*y))
-    // Math.sin(Math.sqrt(x*x + y*y))
-    return Math.sin(x) + Math.cos(y);
+    return _userFunction(x,y);
 }
 
-// calculating gradient
+export function setUserFunction(funcText){
+    try{
+        const fn = new Function('x', 'y', `return ${funcText};`)
+        // test
+        fn(0,0);
+        _userFunction = fn;
+        return true;
+    } catch (e){
+        console.error('Invalid function:', e);
+        return false;
+    }
+}
+
+// calculating gradiesnt
 export function gradient(x,y){
     const dfdx = (f(x+H,y) - f(x-H,y))/(2*H);
     const dfdy = (f(x,y+H) - f(x,y-H))/(2*H);

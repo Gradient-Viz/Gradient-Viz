@@ -1,11 +1,17 @@
 import { useMemo } from "react";
 import * as THREE from 'three';
 import { f } from '../utils/math';
-
-const SIZE = 36;
-const SEGMENTS = 64;
+import useStore from "../store/useStore";
 
 export default function MountainSurface() {
+    const domainMin = useStore((s) => s.domainMin);
+    const domainMax = useStore((s) => s.domainMax);
+    const gridLines = useStore((s) => s.gridLines);
+    const functionVersion = useStore((s) => s.functionVersion);
+
+    const SIZE = domainMax - domainMin;
+    const SEGMENTS = gridLines;
+
     const geometry = useMemo(() => {
         const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
 
@@ -36,7 +42,7 @@ export default function MountainSurface() {
         geo.computeVertexNormals(); 
         return geo;
 
-    }, []);
+    }, [domainMin, domainMax, gridLines, functionVersion]);
     // make y = z
     return (
         <group rotation={[-Math.PI / 2, 0, 0]} geometry={geometry}>
