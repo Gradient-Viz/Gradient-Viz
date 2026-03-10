@@ -36,7 +36,10 @@ function GradientArrow( {x,y, color = '#FFFF00'}){
 
 export default function GradientArrows(){
     const personPosition = useStore((s) => s.personPosition);
+    const showVectors = useStore((s) => s.showVectors);
 
+    if (!showVectors) return null;
+    
     return (
         <group>
             <GradientArrow x={personPosition[0]} y={personPosition[1]} color='#FFFF00'/>

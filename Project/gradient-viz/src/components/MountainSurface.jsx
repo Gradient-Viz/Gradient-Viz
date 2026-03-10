@@ -33,9 +33,9 @@ export default function MountainSurface() {
             pos.setZ(i, z); 
 
             const t = (z-fMin) / (fMax - fMin); // maps
-            colors[i*3] = 0.05 + t * 0.2; // R
-            colors[i*3 + 1] = 0.2 + t * 0.55; // G
-            colors[i*3 + 2] =  0.35 + t * 0.5; // B
+            colors[i*3] =0.02 + t * 0.08; // R
+            colors[i*3 + 1] =  0.05 + t * 0.15; // G
+            colors[i*3 + 2] =  0.1  + t * 0.2; // B
         }
 
         geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -59,11 +59,12 @@ export default function MountainSurface() {
             </mesh>
             {/*Wireframe overlay*/}
             <mesh geometry={geometry}>
-                <meshStandardMaterial
-                    color= "#b8860b"
+                <meshBasicMaterial
+                    color= "#00ffcc"
                     wireframe
                     transparent
-                    opacity={0.6}
+                    opacity={0.3}
+                    toneMapped={false}
                 />
             </mesh>
         </group>

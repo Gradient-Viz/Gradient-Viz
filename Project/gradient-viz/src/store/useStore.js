@@ -5,12 +5,13 @@ const useStore = create((set) => ({
     personPosition: [1.0, 1.0],
     showAscentPath: false,
     ascentProgress: 0,
+    surfacePathProgress: 0,
     functionText: 'Math.sin(x) + Math.cos(x)',
     gridLines: 64,
-    domainMin: -3,
-    domainMax: 3,
+    domainMin: -6,
+    domainMax: 6,
     functionVersion: 0,
-    showGroundContours: true,
+    showGroundContours: false,
     showSurfaceContours: true,
     showVectors: true,
 
@@ -26,7 +27,8 @@ const useStore = create((set) => ({
     setDomainMax: (val) => set({domainMax: val}),
     toggleGroundContours: () => set((s) => ({ showGroundContours: !s.showGroundContours })),
     toggleSurfaceContours: () => set((s) =>  ({ showSurfaceContours: !s.showSurfaceContours })),
-    toggleVectors: () => set((s) => ({ showVectors: !s.showVectors }));
+    toggleVectors: () => set((s) => ({ showVectors: !s.showVectors })),
+    setSurfacePathProgress: (progress) => set({surfacePathProgress: progress}),
     reset: () => set({
         viewMode: '3d_explore',
         personPosition: [1.0, 1.0],

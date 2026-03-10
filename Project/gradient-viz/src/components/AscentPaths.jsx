@@ -9,7 +9,10 @@ export default function AscentPaths(){
     const showAscentPath = useStore((s) => s.showAscentPath);
     const ascentProgress = useStore((s) => s.ascentProgress);
     const setAscentProgress = useStore((s) => s.setAscentProgress);
+    const surfacePathProgress = useStore((s) => s.surfacePathProgress);
+    const setSurfacePathProgress = useStore((s) => s.setSurfacePathProgress);
     const viewMode = useStore((s) => s.viewMode);
+
     // Compute the path once when person positon changes
     const path2D = useMemo(() => {
         return gradientAscentPath(personPosition[0], personPosition[1]);
@@ -23,36 +26,46 @@ export default function AscentPaths(){
         if (showAscentPath && ascentProgress < 1){
             setAscentProgress(Math.min(1, ascentProgress + delta * 0.5));
         }
+        // Animate 3D surface path in 3d_compare mode
+        if (viewMode === '3d_compare' && surfacePathProgress < 1){
+            setSurfacePathProgress(Math.min(1, surfacePathProgress + delta * 0.5 ));
+        }
     });
 
     if(!showAscentPath) return null;
 
     // how many points to draw based on progress
-    const count = Math.max(2, Math.floor(flatPath.length * ascentProgress));
-    const visibleFlat = flatPath.slice(0, count);
-    const visibleSurface = surfacePath.slice(0, count);
+    const flatCount = Math.max(2, Math.floor(flatPath.length * ascentProgress));
+    const visibleFlat = flatPath.slice(0, flatCount);
+
+    const surfaceCount = Math.max(2, Math.floor(surfacePath.length * surfacePathProgress))
+    const visibleSurface = surfacePath.slice(0, surfaceCount);
 
     return(
         <group>
-            {/* 2D path: always visible */}
+            {/* 2D path: always visible once tracing starts*/}
             <Line points={visibleFlat} color="#FF6B6B" lineWidth={3} />
 
             {/* 3D path: when comparing */}
-            {viewMode === '3d_compare' && (
+            {viewMode === '3d_compare' && surfacePathProgress > 0 && (
                 <>
                     <Line points={visibleSurface} color="#58C4DD" lineWidth={3} />
 
                     {/*Vertical connector lines every 10 points */}
-                    {visibleFlat.filter((_, i) => i % 10 === 0).map((pt, i) => (
-                        <Line
-                            key={i}
-                            points={[pt, visibleSurface[i*10]]}
-                            color='#ffffff'
-                            lineWidth={0.5}
-                            transparent
-                            opacity={0.3}
-                        />
-                    ))}
+                    {visibleFlat.filter((_, i) => i % 10 === 0).map((pt, i) => {
+                        const surfaceIdx = i * 10;
+                        if(surfaceIdx >= surfaceCount) return null;
+                        return (
+                            <Line
+                                key={i}
+                                points={[pt, surfacePath[surfaceIdx]]}
+                                color='#ffffff'
+                                lineWidth={0.5}
+                                transparent
+                                opacity={0.3}
+                            />
+                        );
+                    })}
                 </>
             )} 
         </group>

@@ -51,6 +51,10 @@ export default function UIOverlay(){
     const viewMode = useStore((s) => s.viewMode);
     const setViewMode = useStore((s) => s.setViewMode);
     const personPosition = useStore((s) => s.personPosition);
+    const showVectors = useStore((s) => s.showVectors);
+    const toggleVectors = useStore((s) => s.toggleVectors);
+    const showAscentPath = useStore((s) => s.showAscentPath);
+    const ascentProgress = useStore((s) => s.ascentProgress);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const setShowAscentPath = useStore((s) => s.setShowAscentPath);
     const setAscentProgress = useStore((s) => s.setAscentProgress);
@@ -140,6 +144,17 @@ export default function UIOverlay(){
                         >
                             Surface Contours: {showSurfaceContours ? 'ON' : 'OFF'}    
                         </button>
+                        
+                        <button
+                            style={{
+                                ...buttonStyle,
+                                width: '100%',
+                                background: showVectors ? '#3c7e41' : '#555',
+                            }}
+                            onClick={toggleVectors}
+                            >
+                                Gradient Vectors: {showVectors ? 'ON' : 'OFF'}
+                            </button>
                     </div>
                 </div>
 
@@ -190,12 +205,21 @@ export default function UIOverlay(){
                         )}
                         {viewMode === '2d_explore' && (
                             <>
+                            {!showAscentPath &&(
                                 <button style={buttonStyle} onClick={handleTraceAscent}>
                                     Trace Ascent
                                 </button>
+                            )}
+                            {showAscentPath && ascentProgress >= 1 && (
                                 <button style={buttonStyle} onClick={handleReturnTo3D}>
                                     Return to 3D
                                 </button>
+                            )}
+                            {showAscentPath && ascentProgress < 1 && (
+                                <p style={{color: '#58C4DD', fontSize: '11px', margin: '8px 4px'}}>
+                                    Tracing path... {Math.round(ascentProgress * 100)}%
+                                </p>
+                            )}
                             </>
                         )}
                         {viewMode === '3d_compare' && (
