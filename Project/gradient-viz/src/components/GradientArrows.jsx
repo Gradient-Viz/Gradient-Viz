@@ -3,14 +3,6 @@ import { gradient } from "../utils/math";
 import  useStore  from '../store/useStore';
 import { useMemo } from 'react';
 
-const SAMPLE_POINTS = [
-    [1.5, 0], [0, 1.5], [-1.5, 0], [0,-1.5],
-    [1,1], [-1,1], [-1,-1], [1, -1],
-    [2, 0], [0, 2], [-2, 0], [0, -2],
-];
-
-const ARROW_COLOR = 'FFFF00'
-
 function GradientArrow( {x,y, color = '#FFFF00'}){
     const [gx, gy] = gradient(x,y);
     const mag = Math.sqrt(gx * gx + gy * gy);

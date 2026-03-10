@@ -6,7 +6,7 @@ const useStore = create((set) => ({
     showAscentPath: false,
     ascentProgress: 0,
     surfacePathProgress: 0,
-    functionText: 'Math.sin(x) + Math.cos(x)',
+    functionText: '(7*x*y)/exp(x^2+y^2)',
     gridLines: 64,
     domainMin: -6,
     domainMax: 6,

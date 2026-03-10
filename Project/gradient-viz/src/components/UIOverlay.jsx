@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useStore from '../store/useStore';
-import { setUserFunction } from '../utils/math';
+import { setUserFunction, f, gradient, gradientMagnitude } from '../utils/math';
 
 const sidebarStyle = {
     position: 'absolute',
@@ -64,8 +64,10 @@ export default function UIOverlay(){
     const showSurfaceContours = useStore((s) => s.showSurfaceContours);
     const reset = useStore((s) => s.reset);
     const incrementFunctionVersion = useStore((s) => s.incrementFunctionVersion);
+    const domainMin = useStore((s) => s.domainMin);
+    const domainMax = useStore((s) => s.domainMax);
 
-    const [funcText, setFuncText] = useState('sin(x) + cos(y)');
+    const [funcText, setFuncText] = useState('(7*x*y)/exp(x^2+y^2)');
     const [funcError, setFuncError] = useState(false);
 
     const handleFunctionChange = (e)  => {
@@ -166,8 +168,8 @@ export default function UIOverlay(){
                     </div>
                     <input
                         type="range"
-                        min={-3}
-                        max={3}
+                        min={domainMin}
+                        max={domainMax}
                         step={0.1}
                         value={personPosition[0]}
                         onChange={(e) =>
@@ -181,8 +183,8 @@ export default function UIOverlay(){
                 </div>
                 <input
                     type="range"
-                    min={-3}
-                    max={3}
+                    min={domainMin}
+                    max={domainMax}
                     step={0.1}
                     value={personPosition[1]}
                     onChange={(e) => 
@@ -190,6 +192,19 @@ export default function UIOverlay(){
                     }
                     style={{ width: '100%' }}
                 />
+                </div>
+
+                {/* Computed values at person position */}
+                <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', fontFamily: 'monospace', fontSize: '12px' }}>
+                    <div style={{ marginBottom: '4px' }}>
+                        f({personPosition[0].toFixed(2)}, {personPosition[1].toFixed(2)}) = <span style={{ color: '#58C4DD' }}>{f(personPosition[0], personPosition[1]).toFixed(4)}</span>
+                    </div>
+                    <div style={{ marginBottom: '4px' }}>
+                        ∇f = <span style={{ color: '#FFFF00' }}>[{gradient(personPosition[0], personPosition[1]).map(v => v.toFixed(4)).join(', ')}]</span>
+                    </div>
+                    <div>
+                        |∇f| = <span style={{ color: '#FF6B6B' }}>{gradientMagnitude(personPosition[0], personPosition[1]).toFixed(4)}</span>
+                    </div>
                 </div>
 
                 <hr style={{ border: '1px solid #ccc', marginTop: '15px' }}/>

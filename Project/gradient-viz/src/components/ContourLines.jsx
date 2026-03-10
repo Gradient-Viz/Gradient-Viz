@@ -21,7 +21,20 @@ export default function ContourLines(){
     const showSurface = useStore((s) => s.showSurfaceContours);
     const contours = useMemo(() => {
         const levels = autoContourLevels(domainMin, domainMax, domainMin, domainMax);
-        return generateContours(levels, domainMin, domainMax,domainMin, domainMax, 120);
+        const raw = generateContours(levels, domainMin, domainMax, domainMin, domainMax, 120);
+        return raw.map((contour) => ({
+            level: contour.level,
+            segments: contour.segments.map((seg) => ({
+                ground: [
+                    [seg[0][0], 0.01, seg[0][1]],
+                    [seg[1][0], 0.01, seg[1][1]],
+                ],
+                surface: [
+                    [seg[0][0], f(seg[0][0], seg[0][1]) + 0.01, seg[0][1]],
+                    [seg[1][0], f(seg[1][0], seg[1][1]) + 0.01, seg[1][1]],
+                ],
+            })),
+        }));
     }, [domainMin, domainMax, functionVersion]);
 
     return (
@@ -32,21 +45,15 @@ export default function ContourLines(){
                         {showGround && (
                             <Line
                                 key={`${ci}-${si}`}
-                                points={[
-                                    [seg[0][0], 0.01, seg[0][1]],
-                                    [seg[1][0], 0.01, seg[1][1]],
-                                ]}
+                                points={seg.ground}
                                 color={CONTOUR_COLORS[ci % CONTOUR_COLORS.length]}
                                 lineWidth={1.5}
                             />
                         )}
-                        {/*Surface coutour*/ }
+                        {/*Surface contour*/ }
                         {showSurface && viewMode !== '2d_explore' && (
                             <Line
-                                points={[
-                                    [seg[0][0], f(seg[0][0], seg[0][1])+0.01, seg[0][1]],
-                                    [seg[1][0], f(seg[1][0], seg[1][1])+0.01, seg[1][1]],
-                                ]}
+                                points={seg.surface}
                                 color={CONTOUR_COLORS_SURFACE[ci%CONTOUR_COLORS_SURFACE.length]}
                                 lineWidth={1.5}
                             />
