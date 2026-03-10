@@ -12,6 +12,7 @@ const useStore = create((set) => ({
     functionVersion: 0,
     showGroundContours: true,
     showSurfaceContours: true,
+    showVectors: true,
 
     //Actions
     setViewMode: (mode) => set({viewMode: mode}),
@@ -25,11 +26,13 @@ const useStore = create((set) => ({
     setDomainMax: (val) => set({domainMax: val}),
     toggleGroundContours: () => set((s) => ({ showGroundContours: !s.showGroundContours })),
     toggleSurfaceContours: () => set((s) =>  ({ showSurfaceContours: !s.showSurfaceContours })),
+    toggleVectors: () => set((s) => ({ showVectors: !s.showVectors }));
     reset: () => set({
         viewMode: '3d_explore',
         personPosition: [1.0, 1.0],
         showAscentPath: false,
         ascentProgress: 0,
+        surfacePathProgress: 0,
     }),
 }));
 
