@@ -10,7 +10,7 @@ export function f(x,y){
 function mathToJS(expr){
     let js = expr;
     
-    const funcs = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'atan2',
+    const funcs = ['sin', 'cos', 'tan', 'sec', 'cosec', 'cot','asin', 'acos', 'atan', 'atan2',
         'sqrt', 'abs', 'log', 'log2', 'log10', 'exp', 'floor', 'ceil', 'round', 'min', 
         'max', 'pow'];
     
