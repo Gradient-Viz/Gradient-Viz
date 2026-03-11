@@ -3,51 +3,6 @@ import useStore from '../store/useStore';
 import douglasLogo from '../assets/logo.png';
 import { setUserFunction, f, gradient, gradientMagnitude } from '../utils/math';
 
-const sidebarStyle = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '280px',
-    height: '100vh',
-    background: 'rgba(0, 0, 0, 0.95)',
-    borderRight: '2px solid #999',
-    padding: '15px',
-    fontFamily: 'Arial, sans-serif',
-    fontSize: '13px',
-    overflowY: 'auto',
-    zIndex: 10,
-    color: '#cecece',
-};
-
-const inputStyle = {
-    width: '100%',
-    padding: '6px 8px',
-    border: '1px solid #4e4e4e',
-    borderRadius: '3px',
-    fontFamily: 'monospace',
-    fontSize: '13px',
-    marginBottom: '10px',
-};
-
-const sliderLabelStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '4px',
-};
-
-const buttonStyle = {
-    padding: '8px 16px',
-    margin: '4px',
-    background: '#3c7e41',
-    color: 'white',
-    border: 'none',
-    borderRadius: '3px',
-    cursor: 'pointer',
-    fontFamily: 'Arial, sans-serif',
-    fontSize: '13px',
-};
-
 export default function UIOverlay(){
     const viewMode = useStore((s) => s.viewMode);
     const setViewMode = useStore((s) => s.setViewMode);
@@ -96,20 +51,11 @@ export default function UIOverlay(){
     const handleReset = () => reset();
 
     return (
-        <div style={sidebarStyle}>
-            <div style={{ textAlign: "center", marginBottom: "15px" }}>
-            <img
-                src={douglasLogo}
-                alt="Douglas College"
-                style={{
-                    width: "140px",
-                    marginBottom: "8px"
-                }}
-            />
-
-            <h3 style={{ margin: 0, color: "#2a5a2a" }}>
-                Gradient Visualizer
-            </h3>
+        <div className='sidebar'>
+            {/* Header */}
+            <div className="sidebar-header">
+                <img src={douglasLogo} alt="Douglas College" />
+                <h3>Gradient Visualizer</h3>
             </div>
 
             {/* Function input */}
