@@ -66,6 +66,8 @@ export default function UIOverlay(){
     const incrementFunctionVersion = useStore((s) => s.incrementFunctionVersion);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
+    const interactionMode = useStore((s) => s.interactionMode);
+    const setInteractionMode = useStore((s) => s.setInteractionMode);
 
     const [funcText, setFuncText] = useState('(7*x*y)/exp(x^2+y^2)');
     const [funcError, setFuncError] = useState(false);
@@ -156,7 +158,20 @@ export default function UIOverlay(){
                             onClick={toggleVectors}
                             >
                                 Gradient Vectors: {showVectors ? 'ON' : 'OFF'}
-                            </button>
+                        </button>
+
+                        <button
+                            style={{
+                                ...buttonStyle,
+                                width: '100%',
+                                background: interactionMode === "click" ? '#3c7e41' : '#555',
+                            }}
+                            onClick={() =>
+                                setInteractionMode(interactionMode === "click" ? "drag" : "click")
+                            }
+                            >
+                                Interaction Mode: {interactionMode === "click" ? "Click Move": "Drag Trace"}
+                        </button>
                     </div>
                 </div>
 

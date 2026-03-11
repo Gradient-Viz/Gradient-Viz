@@ -14,6 +14,7 @@ const useStore = create((set) => ({
     showGroundContours: false,
     showSurfaceContours: true,
     showVectors: true,
+    interactionMode: "click",
 
     //Actions
     setViewMode: (mode) => set({viewMode: mode}),
@@ -29,6 +30,7 @@ const useStore = create((set) => ({
     toggleSurfaceContours: () => set((s) =>  ({ showSurfaceContours: !s.showSurfaceContours })),
     toggleVectors: () => set((s) => ({ showVectors: !s.showVectors })),
     setSurfacePathProgress: (progress) => set({surfacePathProgress: progress}),
+    setInteractionMode: (mode) => set({interactionMode: mode}),
     reset: () => set({
         viewMode: '3d_explore',
         personPosition: [1.0, 1.0],
