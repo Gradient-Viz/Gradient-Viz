@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import useStore from '../store/useStore';
+import douglasLogo from '../assets/logo.png';
 import { setUserFunction, f, gradient, gradientMagnitude } from '../utils/math';
 
 const sidebarStyle = {
@@ -96,9 +97,20 @@ export default function UIOverlay(){
 
     return (
         <div style={sidebarStyle}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#2a5a2a'}}>
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+            <img
+                src={douglasLogo}
+                alt="Douglas College"
+                style={{
+                    width: "140px",
+                    marginBottom: "8px"
+                }}
+            />
+
+            <h3 style={{ margin: 0, color: "#2a5a2a" }}>
                 Gradient Visualizer
             </h3>
+            </div>
 
             {/* Function input */}
             <label style={{ fontWeight: 'bold'}}>z = f(x,y)</label>
