@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useStore from '../store/useStore';
 import douglasLogo from '../assets/logo.png';
 import { setUserFunction, f, gradient, gradientMagnitude } from '../utils/math';
-
+import './UIOverlay.css'; 
 export default function UIOverlay(){
     const viewMode = useStore((s) => s.viewMode);
     const setViewMode = useStore((s) => s.setViewMode);
@@ -59,85 +59,66 @@ export default function UIOverlay(){
             </div>
 
             {/* Function input */}
-            <label style={{ fontWeight: 'bold'}}>z = f(x,y)</label>
-            <input
-                style={{
-                    ...inputStyle,
-                    borderColor: funcError ? 'red' : '#aaa',
-                }}
-                value={funcText}
-                onChange={handleFunctionChange}
-                onKeyDown={(e) => e.key === 'Enter' && handleApplyFunction()}
-            />
-            <button 
-                style={{ ...buttonStyle, width: '100%', marginBottom: '15px' }}
-                onClick={handleApplyFunction}
-                >
+            <div className="section-card">
+                <span className="section-label">Function</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#888' }}>
+                    z = f(x,y)
+                </span>
+                <input
+                    className={`func-input ${funcError ? 'error' : ''}`}
+                    value={funcText}
+                    onChange={handleFunctionChange}
+                    onKeyDown={(e) => e.key === 'Enter' && handleApplyFunction()}
+                />
+                <button className="btn-primary" onClick={handleApplyFunction}>
                     Graph
                 </button>
+                {funcError && <p className="func-error">Invalid function. Use JavaScript math syntax.</p>}
+            </div>
 
-                {funcError && (
-                    <p  style={{ color: 'red', fontSize: '11px' }}>
-                    Invalid function. Use JavaScript math syntax.
-                    </p>
-                )}
-
-                <hr style={{ border: '1px solid #ccc', marginTop: '15px' }} />
-                <div style={{ margin: '10px' }}>
-                    <label style={{ fontWeight: 'bold' }}>Contour Visiblity</label>
-                    <div style={{ marginTop: '8px' }}>
-                        <button 
-                            style={{
-                                ...buttonStyle,
-                                width: '100%',
-                                background: showGroundContours ? '#3c7e41' : '#555',
-                            }}
-                            onClick={toggleGroundContours}
-                        >
-                            Ground Contours: { showGroundContours ? 'ON' : 'OFF'}
-                        </button>
-                        <button
-                            style={{
-                                ...buttonStyle,
-                                width: '100%',
-                                background:  showSurfaceContours ? '#3c7e41' : '#555', 
-                            }}
-                            onClick={toggleSurfaceContours}
-                        >
-                            Surface Contours: {showSurfaceContours ? 'ON' : 'OFF'}    
-                        </button>
-                        
-                        <button
-                            style={{
-                                ...buttonStyle,
-                                width: '100%',
-                                background: showVectors ? '#3c7e41' : '#555',
-                            }}
-                            onClick={toggleVectors}
-                            >
-                                Gradient Vectors: {showVectors ? 'ON' : 'OFF'}
-                        </button>
-
-                        <button
-                            style={{
-                                ...buttonStyle,
-                                width: '100%',
-                                background: interactionMode === "click" ? '#3c7e41' : '#555',
-                            }}
-                            onClick={() =>
-                                setInteractionMode(interactionMode === "click" ? "drag" : "click")
-                            }
-                            >
-                                Interaction Mode: {interactionMode === "click" ? "Click Move": "Drag Trace"}
-                        </button>
-                    </div>
+            {/* Display Toggles */}
+            <div className="section-card">
+                <span className="section-label">Display</span>
+                <div className="btn-group">
+                    <button
+                        className={`btn-toggle ${showGroundContours ? 'active' : ''}`}
+                        onClick={toggleGroundContours}
+                    >
+                        Ground Contours
+                        <span className="toggle-dot"/>
+                    </button>
+                    <button
+                        className={`btn-toggle ${showSurfaceContours ? 'active' : ''}`}
+                        onClick={toggleSurfaceContours}
+                    >
+                        Surface Contours
+                        <span className="toggle-dot" />
+                    </button>
+                    <button
+                        className={`btn-toggle ${showVectors ? 'active' : ''}`}
+                        onClick={toggleVectors}
+                    >
+                        Gradient Vectors
+                        <span className="toggle-dot" />
+                    </button>
+                    <button
+                        className={`btn-toggle ${interactionMode == 'click' ? 'active' : ''}`}
+                        onClick={() => setInteractionMode(interactionMode === 'click' ? 'drag' : 'click')}
+                    >
+                        {interactionMode === 'click' ? 'Click Move' : 'Drag Trace'}
+                        <span className="toggle-dot" />
+                    </button>
                 </div>
+            </div>
 
-                {/* Person position sliders */}
-                <div style={{ marginTop: '10px' }}>
-                    <label style={{ fontWeight: 'bold' }}>Person Position</label>
-                    <div style={sliderLabelStyle}>
-                        <span>x = {personPosition[0].toFixed(2)}</span>
+            {/* Person position sliders */}
+            <div className="section-card">
+                <span className="section-label">Person Position</span>
+
+                <div className="slider-row">
+                    <div className="slider-label">
+                        <span>x</span>
+                        <span className="slider-value">{personPosition[0].toFixed(2)}</span>
                     </div>
                     <input
                         type="range"
@@ -145,90 +126,92 @@ export default function UIOverlay(){
                         max={domainMax}
                         step={0.1}
                         value={personPosition[0]}
-                        onChange={(e) =>
-                            setPersonPosition([parseFloat(e.target.value), personPosition[1]])
-                        }
-                        style={{ width: '100%' }}
-                />
-
-                <div style={sliderLabelStyle}>
-                    <span>y = {[personPosition[1].toFixed(2)]}</span>
-                </div>
-                <input
-                    type="range"
-                    min={domainMin}
-                    max={domainMax}
-                    step={0.1}
-                    value={personPosition[1]}
-                    onChange={(e) => 
-                        setPersonPosition([personPosition[0], parseFloat(e.target.value)])
-                    }
-                    style={{ width: '100%' }}
-                />
+                        onChange={(e) => setPersonPosition([parseFloat(e.target.value), personPosition[1]])}
+                    />
                 </div>
 
-                {/* Computed values at person position */}
-                <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', fontFamily: 'monospace', fontSize: '12px' }}>
-                    <div style={{ marginBottom: '4px' }}>
-                        f({personPosition[0].toFixed(2)}, {personPosition[1].toFixed(2)}) = <span style={{ color: '#58C4DD' }}>{f(personPosition[0], personPosition[1]).toFixed(4)}</span>
+                <div className="slider-row">
+                    <div className="slider-label">
+                        <span>y</span>
+                        <span className="slider-value">{personPosition[1].toFixed(2)}</span>
                     </div>
-                    <div style={{ marginBottom: '4px' }}>
-                        ∇f = <span style={{ color: '#FFFF00' }}>[{gradient(personPosition[0], personPosition[1]).map(v => v.toFixed(4)).join(', ')}]</span>
-                    </div>
-                    <div>
-                        |∇f| = <span style={{ color: '#FF6B6B' }}>{gradientMagnitude(personPosition[0], personPosition[1]).toFixed(4)}</span>
-                    </div>
-                </div>
-
-                <hr style={{ border: '1px solid #ccc', marginTop: '15px' }}/>
-
-                {/* View mode buttons */}
-                <div style={{marginTop: '10px' }}>
-                    <label style={{ fontWeight: 'bold' }}>Animation Controls</label>
-                    <div style={{ marginTop: '8px' }}>
-                        {viewMode === '3d_explore' && (
-                            <button style={buttonStyle} onClick={handleSwitchTo2D}>
-                                Switch to 2D View
-                            </button>
-                        )}
-                        {viewMode === '2d_explore' && (
-                            <>
-                            {!showAscentPath &&(
-                                <button style={buttonStyle} onClick={handleTraceAscent}>
-                                    Trace Ascent
-                                </button>
-                            )}
-                            {showAscentPath && ascentProgress >= 1 && (
-                                <button style={buttonStyle} onClick={handleReturnTo3D}>
-                                    Return to 3D
-                                </button>
-                            )}
-                            {showAscentPath && ascentProgress < 1 && (
-                                <p style={{color: '#58C4DD', fontSize: '11px', margin: '8px 4px'}}>
-                                    Tracing path... {Math.round(ascentProgress * 100)}%
-                                </p>
-                            )}
-                            </>
-                        )}
-                        {viewMode === '3d_compare' && (
-                            <button style={buttonStyle} onClick={handleReset}>
-                                Reset
-                            </button>
-                        )}
+                    <input
+                        type="range"
+                        min={domainMin}
+                        max={domainMax}
+                        step={0.1}
+                        value={personPosition[1]}
+                        onChange={(e) => setPersonPosition([personPosition[0], parseFloat(e.target.value)])}
+                    /> 
                 </div>
             </div>
 
-            <hr style={{ border: '1px solid #ccc', marginTop: '15px' }}/>
-
-            {/*Info */}
-            <div style={{ marginTop: '10px', color: '#666', fontSize: '11px' }}>
-                {viewMode === '3d_explore' && 
-                    'Explore the 3D surface. Drag to rotate, scroll to zoom.'}
-                {viewMode === '2d_explore' &&
-                    'Overhead 2D view. Yellow arrows show grad(f).'}
-                {viewMode === '3d_compare' && 
-                    'Pink = 2D ascent path. Teal = 3D surface path.'}
+            {/* Computed Values */}
+            <div className="computed-card">
+                <div>
+                    f({personPosition[0].toFixed(2)}, {personPosition[1].toFixed(2)}) ={' '}
+                    <span className="val-cyan">{f(personPosition[0], personPosition[1]).toFixed(4)}</span>
+                </div>
+                <div>
+                    ∇f ={' '}
+                    <span className="val-yellow">
+                        [{gradient(personPosition[0], personPosition[1]).map(v => v.toFixed(4)).join(', ')}]
+                    </span>
+                </div>
+                <div>
+                    |∇f| ={' '}
+                    <span className="val-orange">{gradientMagnitude(personPosition[0], personPosition[1]).toFixed(4)}</span>
+                </div>
             </div>
+
+        {/*Animation Controls */}
+        <div className="section-card">
+            <span className="section-label">Animation Controls</span>
+            {viewMode === '3d_explore' && (
+                <button className="btn-primary" onClick={handleSwitchTo2D}>
+                    Switch to 2D View
+                </button>
+            )}
+            {viewMode === '2d_explore' && (
+                <>
+                    {!showAscentPath && (
+                        <button className="btn-primary" onClick={handleTraceAscent}>
+                            Trace Ascent
+                        </button>
+                    )}
+                    {showAscentPath && ascentProgress >= 1 && (
+                        <button className="btn-primary" onClick={handleReturnTo3D}>
+                            Return to 3D
+                        </button>
+                    )}
+                    {showAscentPath && ascentProgress < 1 && (
+                        <div>
+                            <div className="progress-container">
+                                <div
+                                    className="progress-fill"
+                                    style={{ width: `${Math.round(ascentProgress * 100)}%` }}
+                                />
+                            </div>
+                            <p className="progress-text">
+                                Tracing path... {Math.round(ascentProgress * 100)}%
+                            </p>
+                        </div>
+                    )}
+                </>
+            )}
+            {viewMode === '3d_compare' && (
+                <button className="btn-primary" onClick={handleReset}>
+                    Reset
+                </button>
+            )}
         </div>
+
+        {/* Info */}
+        <div className="info-hint">
+            {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate, scroll to zoom.'}
+            {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
+            {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
+        </div>
+    </div>
     );
 }
