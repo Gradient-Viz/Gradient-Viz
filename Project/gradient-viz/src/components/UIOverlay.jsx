@@ -208,7 +208,7 @@ export default function UIOverlay(){
 
         {/* Info */}
         <div className="info-hint">
-            {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate, scroll to zoom.'}
+            {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
             {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
             {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
         </div>

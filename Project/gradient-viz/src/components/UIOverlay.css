@@ -243,7 +243,7 @@ input[type="range"]::-moz-range-thumb{
 
 /* Info-hint */
 .info-hint {
-    color: #555;
+    color: #f7f5f5;
     font-size: 11px;
     line-height: 1.6;
     padding: 8px 12px;
