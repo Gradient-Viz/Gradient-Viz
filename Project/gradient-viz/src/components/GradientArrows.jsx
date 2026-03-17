@@ -19,7 +19,7 @@ function GradientArrow( {x,y, color = '#FFFF00'}){
     return (
         <group>
             <Line points={[start, end]} color={color} lineWidth={2.5} />
-            <mesh position={[end[0], 0.02, end[2]]} rotation={[0, -angle, Math.PI/2]}>
+            <mesh position={[end[0], 0.02, end[2]]} rotation={[0, angle, Math.PI/2]}>
                 <coneGeometry args={[0.04, 0.1, 8]} />
                 <meshBasicMaterial color={color}/>
             </mesh>
