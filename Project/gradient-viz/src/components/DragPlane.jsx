@@ -19,22 +19,24 @@ export default function DragPlane(){
     
     //Click mode (3D)
     const handleClick = (e) =>{
+        if (!e.shiftKey) return;
         e.stopPropagation();
-        const x = Math.max(domainMin, Math.min(domainMax, e.point.x));
-        const y = Math.max(domainMin, Math.min(domainMax, e.point.z));
-        setPersonPosition([x,y]);
+        updatePosition(e);
     }
 
     //Drag mode (trace ascent)
     const handlePointerDown = (e) => {
-        if (interactionMode !== "drag") return;
+        //only work when SHIFT is held
+        if (!e.shiftKey)
+            return;
+
         e.stopPropagation();
         setDragging(true);
         updatePosition(e);
     };
 
     const handlePointerMove = (e) => {
-        if (!dragging || interactionMode !== "drag") return;
+        if (!dragging || !e.shiftKey) return;
         e.stopPropagation();
         updatePosition(e);
     };
