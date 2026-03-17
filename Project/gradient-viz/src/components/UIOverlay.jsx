@@ -87,8 +87,6 @@ export default function UIOverlay(){
     };
 
     const handleSwitchTo2D = () => setViewMode('2d_explore');
-    const handleSwitchToFirstPerson = () => setViewMode('first_person');
-    const handleExitFirstPerson = () => setViewMode('3d_explore');
     const handleTraceAscent = () => {
         setAscentProgress(0);
         setShowAscentPath(true);
@@ -242,27 +240,11 @@ export default function UIOverlay(){
                 <div style={{marginTop: '10px' }}>
                     <label style={{ fontWeight: 'bold' }}>Animation Controls</label>
                     <div style={{ marginTop: '8px' }}>
-                    {viewMode === '3d_explore' && (
-                        <>
+                        {viewMode === '3d_explore' && (
                             <button style={buttonStyle} onClick={handleSwitchTo2D}>
                                 Switch to 2D View
                             </button>
-
-                            {/* Enter First Person button */}
-                            <button style={buttonStyle} onClick={handleSwitchToFirstPerson}>
-                                First Person View
-                            </button>
-                        </>
-
-                    )}
- 
-                    {/* Exit First Person button */}
-                    {viewMode === 'first_person' && (
-                        <button style={buttonStyle} onClick={handleExitFirstPerson}>
-                            Exit First Person
-                        </button>
-                    )}
-
+                        )}
                         {viewMode === '2d_explore' && (
                             <>
                             {!showAscentPath &&(
@@ -300,8 +282,6 @@ export default function UIOverlay(){
                     'Overhead 2D view. Yellow arrows show grad(f).'}
                 {viewMode === '3d_compare' && 
                     'Pink = 2D ascent path. Teal = 3D surface path.'}
-                {viewMode === 'first_person' &&
-                    'First-person camera. Use mouse to look and move along the surface.'}
             </div>
         </div>
     );
