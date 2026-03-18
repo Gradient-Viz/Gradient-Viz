@@ -50,6 +50,9 @@ export default function UIOverlay(){
     const handleReturnTo3D = () => setViewMode('3d_compare');
     const handleReset = () => reset();
 
+    const handleSwitchToFirstPerson = () => setViewMode('first_person');
+    const handleExitFirstPerson = () => setViewMode('3d_compare');
+
     return (
         <div className='sidebar'>
             {/* Header */}
@@ -204,6 +207,24 @@ export default function UIOverlay(){
                     Reset
                 </button>
             )}
+
+        {/* View mode buttons */}
+        {viewMode === '3d_explore' && (
+            <>
+                {/* Enter First Person button */}
+                        <button className="btn-primary" onClick={handleSwitchToFirstPerson}>
+                    First Person View
+                </button>
+            </>
+        )}
+
+        {/* Exit First Person button */}
+        {viewMode === 'first_person' && (
+            <button className="btn-primary" onClick={handleExitFirstPerson}>
+                Exit First Person
+            </button>
+        )}
+
         </div>
 
         {/* Info */}
