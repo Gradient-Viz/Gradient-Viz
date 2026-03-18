@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { PointerLockControls } from '@react-three/drei';
@@ -26,15 +26,16 @@ export default function CameraController(){
     const controlsRef = useRef();
     const pointerRef = useRef();
     const { camera } = useThree();
+    const [isShiftPressed, setIsShiftPressed] = useState(false);
 
     useEffect(() => {
-        const config = CAMERA_POSITIONS[viewMode];
-        if(!config) return;
+        const handleKeyDown = (e) => {
+            if (e.shiftKey) setIsShiftPressed(true);
+        };
 
-        // Disable controls
-        if(controlsRef.current){
-            controlsRef.current.enabled = false;
-        }
+        const handleKeyUp = (e) => {
+            if (!e.shiftKey) setIsShiftPressed(false);
+        };
 
         if (viewMode === "first_person") {
             // Disable orbit controls
@@ -142,6 +143,7 @@ export default function CameraController(){
     ) : (
         <OrbitControls
             ref={controlsRef}
+            enabled={!isShiftPressed && viewMode !== '2d_explore'}
             enableRotate={viewMode !== '2d_explore'}
             maxPolarAngle={viewMode === '2d_explore' ? 0 : Math.PI}
         />
