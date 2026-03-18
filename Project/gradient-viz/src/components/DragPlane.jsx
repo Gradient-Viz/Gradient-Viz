@@ -19,7 +19,7 @@ export default function DragPlane(){
     
     //Click mode (3D)
     const handleClick = (e) =>{
-        if (!e.shiftKey) return;
+        if (e.shiftKey) return;
         e.stopPropagation();
         updatePosition(e);
     }
@@ -29,7 +29,6 @@ export default function DragPlane(){
         //only work when SHIFT is held
         if (!e.shiftKey)
             return;
-
         e.stopPropagation();
         setDragging(true);
         updatePosition(e);

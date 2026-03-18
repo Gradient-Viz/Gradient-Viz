@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import gsap from 'gsap';
@@ -14,38 +14,30 @@ export default function CameraController(){
     const viewMode = useStore((s) => s.viewMode);
     const controlsRef = useRef();
     const { camera } = useThree();
+    const [isShiftPressed, setIsShiftPressed] = useState(false);
 
     useEffect(() => {
-        const config = CAMERA_POSITIONS[viewMode];
-        if(!config) return;
+        const handleKeyDown = (e) => {
+            if (e.shiftKey) setIsShiftPressed(true);
+        };
 
-        // Disable controls
-        if(controlsRef.current){
-            controlsRef.current.enabled = false;
-        }
+        const handleKeyUp = (e) => {
+            if (!e.shiftKey) setIsShiftPressed(false);
+        };
 
-        // Animate camera pos
-        gsap.to(camera.position, {
-            x: config.pos[0],
-            y: config.pos[1],
-            z: config.pos[2],
-            duration: 1.5,
-            ease: 'power2.inOut',
-            onUpdate: () => {
-                camera.lookAt(config.target[0], config.target[1], config.target[2])
-            },
-            onComplete: () =>{
-                // Re-enable controls
-                if (controlsRef.current){
-                    controlsRef.current.enabled = viewMode !== '2d_explore';
-                }
-            },
-        });
-    }, [viewMode, camera]);
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+        }, []);
 
     return (
         <OrbitControls
             ref={controlsRef}
+            enabled={!isShiftPressed && viewMode !== '2d_explore'}
             enableRotate={viewMode !== '2d_explore'}
             maxPolarAngle={viewMode === '2d_explore' ? 0 : Math.PI}
         />
