@@ -50,6 +50,9 @@ export default function UIOverlay(){
     const handleReturnTo3D = () => setViewMode('3d_compare');
     const handleReset = () => reset();
 
+    const handleSwitchToFirstPerson = () => setViewMode('first_person');
+    const handleExitFirstPerson = () => setViewMode('3d_explore');
+
     return (
         <div className='sidebar'>
             {/* Header */}
@@ -102,7 +105,7 @@ export default function UIOverlay(){
                         <span className="toggle-dot" />
                     </button>
                     <button
-                        className={`btn-toggle ${interactionMode == 'click' ? 'active' : ''}`}
+                        className={`btn-toggle ${interactionMode === 'click' ? 'active' : ''}`}
                         onClick={() => setInteractionMode(interactionMode === 'click' ? 'drag' : 'click')}
                     >
                         {interactionMode === 'click' ? 'Click Move' : 'Drag Trace'}
@@ -167,11 +170,27 @@ export default function UIOverlay(){
         {/*Animation Controls */}
         <div className="section-card">
             <span className="section-label">Animation Controls</span>
-            {viewMode === '3d_explore' && (
-                <button className="btn-primary" onClick={handleSwitchTo2D}>
-                    Switch to 2D View
-                </button>
-            )}
+
+                {viewMode === '3d_explore' && (
+                    <button className="btn-primary" onClick={handleSwitchTo2D}>
+                        Switch to 2D View
+                    </button>
+                )}
+
+                {/* First Person button */}
+                {viewMode === '3d_explore' && (
+                    <button className="btn-primary" onClick={handleSwitchToFirstPerson}>
+                        First Person View
+                    </button>
+                )}
+
+                {/* Exit First Person button */}
+                {viewMode === 'first_person' && (
+                    <button className="btn-primary" onClick={handleExitFirstPerson}>
+                        Exit First Person
+                    </button>
+                )}
+
             {viewMode === '2d_explore' && (
                 <>
                     {!showAscentPath && (
@@ -211,6 +230,7 @@ export default function UIOverlay(){
             {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
             {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
             {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
+            {viewMode === 'first_person' && 'First-person camera. Use mouse to look and move along the surface.'}
         </div>
     </div>
     );
