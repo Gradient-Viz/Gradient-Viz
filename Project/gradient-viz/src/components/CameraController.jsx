@@ -17,6 +17,37 @@ export default function CameraController(){
     const [isShiftPressed, setIsShiftPressed] = useState(false);
 
     useEffect(() => {
+         const config = CAMERA_POSITIONS[viewMode]; 
+         if (!config || !controlsRef.current) return;
+
+        gsap.to(camera.position, {
+            x: config.pos[0],
+            y: config.pos[1],
+            z: config.pos[2],
+            duration: 1.5,
+            ease: 'power2.inOut',
+            onUpdate: () => {
+                camera.lookAt(config.target[0], config.target[1], config.target[2])
+            },
+            onComplete: () =>{
+                // Re-enable controls
+                if (controlsRef.current){
+                    controlsRef.current.enabled = viewMode !== '2d_explore';
+                }
+            },
+        });
+
+        gsap.to(controlsRef.current.target,{
+            x: config.target[0],
+            y: config.target[1],
+            z: config.target[2],
+            duration: 1,
+            ease: 'power2.inOut'
+        })
+    }, [viewMode, camera]);
+
+
+    useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.shiftKey) setIsShiftPressed(true);
         };

@@ -39,7 +39,7 @@ export default function GradientArrows(){
 
     const samplePoints = useMemo(() => {
         const points = [];
-        const step = 1.5; // one arrow per unit
+        const step = 0.5; // one arrow per unit
         for(let x = domainMin; x <= domainMax; x+= step){
             for(let y = domainMin; y <= domainMax; y += step){
                 points.push([x,y]);
