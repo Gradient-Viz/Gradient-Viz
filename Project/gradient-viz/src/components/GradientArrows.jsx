@@ -2,6 +2,7 @@ import {Line } from '@react-three/drei';
 import { gradient } from "../utils/math";
 import  useStore  from '../store/useStore';
 import { useMemo } from 'react';
+import { Quaternion, Vector3 } from 'three';
 
 function GradientArrow( {x,y, color = '#FFFF00'}){
     const [gx, gy] = gradient(x,y);
@@ -14,12 +15,15 @@ function GradientArrow( {x,y, color = '#FFFF00'}){
 
     const start = [x, 0.02, y];
     const end = [x + dx, 0.02, y + dy];
-    const angle = Math.atan2(dy, dx);
+
+    const direction = new Vector3(dx, 0, dy).normalize();
+    const up = new Vector3(0, 1, 0);
+    const quaternion = new Quaternion().setFromUnitVectors(up, direction);
 
     return (
         <group>
             <Line points={[start, end]} color={color} lineWidth={2.5} />
-            <mesh position={[end[0], 0.02, end[2]]} rotation={[0, angle, Math.PI/2]}>
+            <mesh position={[end[0], 0.02, end[2]]} quaternion={quaternion}>
                 <coneGeometry args={[0.04, 0.1, 8]} />
                 <meshBasicMaterial color={color}/>
             </mesh>
