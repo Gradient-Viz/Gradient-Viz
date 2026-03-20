@@ -167,42 +167,48 @@ export default function UIOverlay(){
         {/*Animation Controls */}
         <div className="section-card">
             <span className="section-label">Animation Controls</span>
-            {viewMode === '3d_explore' && (
-                <button className="btn-primary" onClick={handleSwitchTo2D}>
+            <div className="btn-group">
+                <button 
+                    className={`btn-primary ${viewMode !== '3d_explore' ? 'disabled' : ''}`}
+                    onClick={handleSwitchTo2D}
+                    disabled={viewMode !== '3d_explore'}
+                >
                     Switch to 2D View
                 </button>
-            )}
-            {viewMode === '2d_explore' && (
-                <>
-                    {!showAscentPath && (
-                        <button className="btn-primary" onClick={handleTraceAscent}>
-                            Trace Ascent
-                        </button>
-                    )}
-                    {showAscentPath && ascentProgress >= 1 && (
-                        <button className="btn-primary" onClick={handleReturnTo3D}>
-                            Return to 3D
-                        </button>
-                    )}
-                    {showAscentPath && ascentProgress < 1 && (
-                        <div>
-                            <div className="progress-container">
-                                <div
-                                    className="progress-fill"
-                                    style={{ width: `${Math.round(ascentProgress * 100)}%` }}
-                                />
-                            </div>
-                            <p className="progress-text">
-                                Tracing path... {Math.round(ascentProgress * 100)}%
-                            </p>
-                        </div>
-                    )}
-                </>
-            )}
-            {viewMode === '3d_compare' && (
-                <button className="btn-primary" onClick={handleReset}>
+                <button 
+                    className={`btn-primary ${viewMode !== '2d_explore' || showAscentPath ? 'disabled' : ''}`}
+                    onClick={handleTraceAscent}
+                    disabled={viewMode !== '2d_explore' || showAscentPath}
+                >
+                    Trace Ascent
+                </button>
+                <button 
+                    className={`btn-primary ${viewMode !== '2d_explore' || !showAscentPath || ascentProgress < 1 ? 'disabled' : ''}`}
+                    onClick={handleReturnTo3D}
+                    disabled={viewMode !== '2d_explore' || !showAscentPath || ascentProgress < 1}
+                >
+                    Return to 3D
+                </button>
+                <button 
+                    className={`btn-primary ${viewMode !== '3d_compare' ? 'disabled' : ''}`}
+                    onClick={handleReset}
+                    disabled={viewMode !== '3d_compare'}
+                >
                     Reset
                 </button>
+            </div>
+            {showAscentPath && ascentProgress < 1 && viewMode === '2d_explore' && (
+                <div style={{ marginTop: '12px' }}>
+                    <div className="progress-container">
+                        <div
+                            className="progress-fill"
+                            style={{ width: `${Math.round(ascentProgress * 100)}%` }}
+                        />
+                    </div>
+                    <p className="progress-text">
+                        Tracing path... {Math.round(ascentProgress * 100)}%
+                    </p>
+                </div>
             )}
         </div>
 
