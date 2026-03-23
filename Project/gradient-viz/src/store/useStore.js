@@ -15,6 +15,9 @@ const useStore = create((set) => ({
     showSurfaceContours: true,
     showVectors: true,
     interactionMode: "click",
+    isVRsession: false,
+    vrUIVisible: true,
+
 
     //Actions
     setViewMode: (mode) => set({viewMode: mode}),
@@ -31,6 +34,8 @@ const useStore = create((set) => ({
     toggleVectors: () => set((s) => ({ showVectors: !s.showVectors })),
     setSurfacePathProgress: (progress) => set({surfacePathProgress: progress}),
     setInteractionMode: (mode) => set({interactionMode: mode}),
+    setIsVRsession: (val) => set({ isVRsession: val}),
+    toggleVRUI: () => set((s) => ({ vrUIVisible: !s.vrUIVisible })),
     reset: () => set({
         viewMode: '3d_explore',
         personPosition: [1.0, 1.0],

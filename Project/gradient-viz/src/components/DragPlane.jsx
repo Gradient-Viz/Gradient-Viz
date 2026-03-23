@@ -4,6 +4,7 @@ import useStore from '../store/useStore';
 export default function DragPlane(){
     const meshRef = useRef();
 
+    const isVRsession = useStore((s) => s.isVRsession);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
@@ -26,12 +27,17 @@ export default function DragPlane(){
 
     //Drag mode (trace ascent)
     const handlePointerDown = (e) => {
+        if(isVRsession){
+            setDragging(true);
+            updatePosition(e);
+        }else{
         //only work when SHIFT is held
-        if (!e.shiftKey)
-            return;
-        e.stopPropagation();
-        setDragging(true);
-        updatePosition(e);
+            if (!e.shiftKey){
+                return;
+            setDragging(true);
+            updatePosition(e);
+            }
+        }
     };
 
     const handlePointerMove = (e) => {

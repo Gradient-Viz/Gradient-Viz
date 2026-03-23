@@ -11,6 +11,7 @@ const CAMERA_POSITIONS = {
 };
 
 export default function CameraController(){
+    const isVRsession = useStore((s) => s.isVRsession);
     const viewMode = useStore((s) => s.viewMode);
     const controlsRef = useRef();
     const { camera } = useThree();
@@ -65,6 +66,9 @@ export default function CameraController(){
         };
         }, []);
 
+
+    if (isVRsession) return null;
+    
     return (
         <OrbitControls
             ref={controlsRef}
