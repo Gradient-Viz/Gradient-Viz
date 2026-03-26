@@ -50,6 +50,9 @@ export default function UIOverlay(){
     const handleReturnTo3D = () => setViewMode('3d_compare');
     const handleReset = () => reset();
 
+    const handleSwitchToFirstPerson = () => setViewMode('first_person');
+    const handleExitFirstPerson = () => setViewMode('3d_explore');
+
     return (
         <div className='sidebar'>
             {/* Header */}
@@ -195,7 +198,24 @@ export default function UIOverlay(){
                     disabled={viewMode !== '3d_compare'}
                 >
                     Reset
-                </button>
+                    </button>
+
+                <button
+                    className={`btn-primary ${viewMode !== 'first_person' ? 'disabled' : ''}`}
+                    onClick={handleSwitchToFirstPerson}
+                    disabled={viewMode !== 'first_person'}
+                >
+                    First Person button
+                    </button>
+
+                <button
+                    className={`btn-primary ${viewMode !== 'first_person' ? 'disabled' : ''}`}
+                    onClick={handleExitFirstPerson}
+                    disabled={viewMode !== 'first_person'}
+                >
+                    Exit First Person button
+                    </button>
+
             </div>
             {showAscentPath && ascentProgress < 1 && viewMode === '2d_explore' && (
                 <div style={{ marginTop: '12px' }}>
@@ -217,6 +237,7 @@ export default function UIOverlay(){
             {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
             {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
             {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
+            {viewMode === 'first_person' && 'First-person camera. Use mouse to look and move along the surface.'}
         </div>
     </div>
     );
