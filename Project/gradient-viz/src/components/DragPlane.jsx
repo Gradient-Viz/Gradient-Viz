@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import useStore from '../store/useStore';
+import { useXRInputSourceEvent } from '@react-three/xr'
 
 export default function DragPlane(){
     const meshRef = useRef();
@@ -47,6 +48,29 @@ export default function DragPlane(){
     const handlePointerUp = () => {
         setDragging(false);
     };
+
+    // Right Trigger (select) - place marker
+    useXRInputSourceEvent('all', 'selectstart', (event) => {
+        if (event.inputSource.handedness === 'right'){
+          console.log('XR Event:', Object.keys(event));
+          console.log('Event pro:', Object.keys(event)); 
+        }
+    }, []);
+
+    // Right Controller (Right grip) - test
+    useXRInputSourceEvent('all', 'squeezestart', (event) => {
+        if (event.inputSource.handedness == 'right'){
+            console.log('Squeeze Event:', event);
+            console.log('Squueez pro:', Object.keys(event)); 
+        }
+    }, []);
+
+    // useXRInputSourceEvent('all', 'selectstart', (event) => {
+    //     if (event.inputSource.handedness == 'right'){
+    //         setDragging(false);
+    //     }
+    // }, []);
+
 
     return (
         <mesh
