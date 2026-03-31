@@ -12,6 +12,7 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import {XR, createXRStore } from '@react-three/xr';
 import useStore from './store/useStore';
 import VRUIPanel from './components/vr/VRUIPanel';
+import VRMiniMap from './components/vr/VRMiniMap';
 
 const xrStore = createXRStore();
 
@@ -34,6 +35,7 @@ function App() {
               <GradientArrows />
               <AscentPaths />
               <VRUIPanel />
+              <VRMiniMap />
               <PersonMarker />
               <CameraController />
               <DragPlane />

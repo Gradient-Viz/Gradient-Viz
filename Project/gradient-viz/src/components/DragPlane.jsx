@@ -32,11 +32,9 @@ export default function DragPlane(){
             updatePosition(e);
         }else{
         //only work when SHIFT is held
-            if (!e.shiftKey){
-                return;
+            if (!e.shiftKey) return;
             setDragging(true);
             updatePosition(e);
-            }
         }
     };
 

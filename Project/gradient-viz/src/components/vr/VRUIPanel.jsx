@@ -11,7 +11,8 @@ export default function VRUIPanel(){
     const showGroundContours = useStore((s) => s.showGroundContours);
     const toggleGroundContours = useStore((s) => s.toggleGroundContours);
     const toggleSurfaceContours = useStore((s) => s.toggleSurfaceContours);
-
+    const setViewMode = useStore((s) => s.setViewMode);
+    const viewMode = useStore((s) => s.viewMode);
 
     if (!isVRsession || !vrUIVisible) return null;
 
@@ -46,6 +47,13 @@ export default function VRUIPanel(){
                 onClick={toggleSurfaceContours}
                 width={0.25}
             /> 
+
+            <VRButton
+                position={[-0.15, -0.14, 0.01]}
+                label={viewMode === '3d_explore' ? '2D View' : '3D View'}
+                onClick={() => setViewMode(viewMode === "3d_explore" ? "2d_explore" : "3d_explore")}
+                width={0.25} 
+            />
         </group>
     )
 }
