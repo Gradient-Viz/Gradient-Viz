@@ -3,7 +3,7 @@ import useStore from "../../store/useStore";
 import VRButton from "./VRButton";
 import { forwardRef } from "react";
 
-const panelRef = forwardRef(function VRUIPanel(props, ref){
+const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
     const isVRsession = useStore((s) => s.isVRsession);
     const vrUIVisible = useStore((s) => s.vrUIVisible);
     const showVectors = useStore((s) => s.showVectors);
@@ -14,13 +14,13 @@ const panelRef = forwardRef(function VRUIPanel(props, ref){
     const toggleSurfaceContours = useStore((s) => s.toggleSurfaceContours);
     const setViewMode = useStore((s) => s.setViewMode);
     const viewMode = useStore((s) => s.viewMode);
-    const VRUIPanelPose = useStore((s) => s.setVRUIPanelPose);
-    const VRUIPanelRotation = useStore((s) => s.setVRUIPanelRotation);
+    const vrUIPanelPosition = useStore((s) => s.vrUIPanelPosition);
+    const vrUIPanelRotation = useStore((s) => s.vrUIPanelRotation);
 
     if (!isVRsession || !vrUIVisible) return null;
 
     return (
-        <group position={VRUIPanelPose} rotation={VRUIPanelRotation}>
+        <group ref={ref} position={vrUIPanelPosition} rotation={vrUIPanelRotation}>
             <mesh>
                 <boxGeometry args={[0.6, 0.5, 0.01]}/>
                 <meshStandardMaterial color="#1a1a2e" transparent opacity={0.9}/>
@@ -58,5 +58,7 @@ const panelRef = forwardRef(function VRUIPanel(props, ref){
                 width={0.25} 
             />
         </group>
-    )
-})
+    );
+});
+
+export default VRUIPanel;

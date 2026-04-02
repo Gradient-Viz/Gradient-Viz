@@ -43,7 +43,7 @@ const useStore = create((set) => ({
     setVRUIPanelPose: (position, rotation) => set(({vrUIPanelPosition: position, vrUIPanelRotation: rotation})),
     setVRLeftGripActive: (active) => set({vrLeftGripActive: active}),
     setVRRightGripActive: (active) => set({vrRightGripActive: active}),
-    setVRUIVisible: (visible) => set((s) => ({vrUIVisible: visible})),
+    setVRUIVisible: (visible) => set({vrUIVisible: visible}),
 
     reset: () => set({
         viewMode: '3d_explore',

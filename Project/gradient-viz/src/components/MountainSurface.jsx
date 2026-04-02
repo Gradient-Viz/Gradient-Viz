@@ -12,7 +12,8 @@ export default function MountainSurface() {
     const SIZE = domainMax - domainMin;
     const SEGMENTS = gridLines;
 
-    const geometry = useMemo(() => {
+    const geometry = useMemo(() => { 
+        void functionVersion;
         const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
         const pos = geo.attributes.position;
         const colors = new Float32Array(pos.count * 3);
@@ -44,7 +45,7 @@ export default function MountainSurface() {
         geo.computeVertexNormals(); 
         return geo;
 
-    }, [domainMin, domainMax, gridLines, functionVersion]);
+    }, [SIZE, SEGMENTS, functionVersion]);
     // make y = z
     return (
         <group>

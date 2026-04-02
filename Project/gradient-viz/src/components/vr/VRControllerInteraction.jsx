@@ -18,9 +18,10 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
     const vrRightGripActive = useStore((s) => s.vrRightGripActive);
     const setVRRightGripActive = useStore((s) => s.setVRRightGripActive);
     const vrLeftGripActive = useStore((s) => s.vrLeftGripActive);
-    const setLeftGripActive = useStore((s) => s.setLeftGripActive);
-    const VRUIPanelRotation = useStore((s) => s.VRUIPanelRotation);
+    const setVRLeftGripActive = useStore((s) => s.setVRLeftGripActive);
+    //const vrUIPanelPosition = useStore((s) => s.vrUIPanelPosition);
     const setVRUIPanelPose = useStore((s) => s.setVRUIPanelPose);
+    const vrUIPanelRotation = useStore((s) => s.vrUIPanelRotation);
 
     const rightController = useXRInputSourceState("controller", "right");
     const leftController = useXRInputSourceState("controller", "left");
@@ -29,8 +30,8 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
     const panelOffsetRef = useRef(new THREE.Vector3());
 
     const clampXZ = (point) => {
-        const x = Math.max(domainMax, Math.min(domainMax, point.x));
-       const z = Math.max(domainMax, Math.min(domainMax, point.z)); 
+        const x = Math.max(domainMin, Math.min(domainMax, point.x));
+       const z = Math.max(domainMin, Math.min(domainMax, point.z)); 
        return [x, z];
     };
 
@@ -76,7 +77,7 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
             } 
 
             if(event.inputSource.handedness === "left"){
-                setLeftGripActive(true);
+                setVRLeftGripActive(true);
 
                 const panel = panelRef?.current;
                 const leftObject = leftController?.object;
@@ -92,6 +93,53 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
         },[isVRsession, leftController]
     );
 
-    
+    useXRInputSourceEvent(
+        "all",
+        "squeezeend",
+        (event) => {
+            if (!isVRsession) return;
+
+            if(event.inputSource.handedness === "right"){
+                setVRRightGripActive(false);
+            }
+
+            if(event.inputSource.handedness === 'left'){
+                setVRLeftGripActive(false);
+            }
+        }, [isVRsession]
+    );
+
+    useXRControllerButtonEvent(rightController, "a-button", (state) => {
+        if (!isVRsession) return;
+        if (state === "pressed") toggleVRUI();
+    });
+
+    useFrame(() => {
+        if (!isVRsession) return;
+        if(vrRightGripActive){
+            const hit = raycastetoDragPlane(rightController);
+            if(hit){
+                setPersonPosition(clampXZ(hit));
+            }
+        }
+        
+        if(vrLeftGripActive){
+            const panel = panelRef?.current;
+            const leftObject = leftController?.object;
+            if (!panel || !leftObject) return;
+
+            const controllerWorld = new THREE.Vector3();
+            leftObject.getWorldPosition(controllerWorld);
+
+            const targetPos = controllerWorld.add(panelOffsetRef.current);
+
+            setVRUIPanelPose(
+                [targetPos.x, targetPos.y, targetPos.z],
+                vrUIPanelRotation
+            );
+        }
+    });
+
+    return null;
 
 }

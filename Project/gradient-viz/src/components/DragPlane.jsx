@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import useStore from '../store/useStore';
 import { forwardRef, useImperativeHandle } from 'react';
 
-const dragPlaneRef = forwardRef(function DragPlane(props, ref){
+const DragPlane = forwardRef(function DragPlane(props, ref){
     const meshRef = useRef();
 
     useImperativeHandle(ref, () => meshRef.current);
@@ -88,7 +88,7 @@ const dragPlaneRef = forwardRef(function DragPlane(props, ref){
             onPointerLeave={handlePointerUp}
             >
                 <planeGeometry args={[domainMax - domainMin, domainMax - domainMin]} />
-                <meshBasicMaterial transparent opacity={0} />
+                <meshBasicMaterial color="#ff3b6b" transparent opacity={0.2} />
             </mesh>
     );
 })
