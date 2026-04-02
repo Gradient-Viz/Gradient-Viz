@@ -17,6 +17,10 @@ const useStore = create((set) => ({
     interactionMode: "click",
     isVRsession: false,
     vrUIVisible: true,
+    vrUIPanelPosition: [0, 1.2, -1.5],
+    vrUIPanelRotation: [0,0,0],
+    vrLeftGripActive: false,
+    vrRightGripActive: false,
 
 
     //Actions
@@ -36,12 +40,21 @@ const useStore = create((set) => ({
     setInteractionMode: (mode) => set({interactionMode: mode}),
     setIsVRsession: (val) => set({ isVRsession: val}),
     toggleVRUI: () => set((s) => ({ vrUIVisible: !s.vrUIVisible })),
+    setVRUIPanelPose: (position, rotation) => set(({vrUIPanelPosition: position, vrUIPanelRotation: rotation})),
+    setVRLeftGripActive: (active) => set({vrLeftGripActive: active}),
+    setVRRightGripActive: (active) => set({vrRightGripActive: active}),
+    setVRUIVisible: (visible) => set((s) => ({vrUIVisible: visible})),
+
     reset: () => set({
         viewMode: '3d_explore',
         personPosition: [1.0, 1.0],
         showAscentPath: false,
         ascentProgress: 0,
         surfacePathProgress: 0,
+        vrLeftGripActive: false, 
+        vrRightGripActive: false,
+        vrUIPanelPosition:[0, 1.2, -1.5],
+        vrUIPanelRotation: [0,0,0],
     }),
 }));
 

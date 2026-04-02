@@ -1,15 +1,17 @@
 import { useRef, useState } from 'react';
 import useStore from '../store/useStore';
-import { useXRInputSourceEvent } from '@react-three/xr'
+import { forwardRef, useImperativeHandle } from 'react';
 
-export default function DragPlane(){
+const dragPlaneRef = forwardRef(function DragPlane(props, ref){
     const meshRef = useRef();
+
+    useImperativeHandle(ref, () => meshRef.current);
 
     const isVRsession = useStore((s) => s.isVRsession);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
-    const interactionMode = useStore((s) => s.interactionMode);
+    // const interactionMode = useStore((s) => s.interactionMode);
 
     const [dragging, setDragging] = useState(false);
 
@@ -40,7 +42,9 @@ export default function DragPlane(){
     };
 
     const handlePointerMove = (e) => {
-        if (!dragging || !e.shiftKey) return;
+        if (!dragging) return;
+        if (!isVRsession && !e.shiftKey) return;
+
         e.stopPropagation();
         updatePosition(e);
     };
@@ -49,21 +53,21 @@ export default function DragPlane(){
         setDragging(false);
     };
 
-    // Right Trigger (select) - place marker
-    useXRInputSourceEvent('all', 'selectstart', (event) => {
-        if (event.inputSource.handedness === 'right'){
-          console.log('XR Event:', Object.keys(event));
-          console.log('Event pro:', Object.keys(event)); 
-        }
-    }, []);
+    // // Right Trigger (select) - place marker
+    // useXRInputSourceEvent('all', 'selectstart', (event) => {
+    //     if (event.inputSource.handedness === 'right'){
+    //       console.log('XR Event:', Object.keys(event));
+    //       console.log('Event pro:', Object.keys(event)); 
+    //     }
+    // }, []);
 
-    // Right Controller (Right grip) - test
-    useXRInputSourceEvent('all', 'squeezestart', (event) => {
-        if (event.inputSource.handedness == 'right'){
-            console.log('Squeeze Event:', event);
-            console.log('Squueez pro:', Object.keys(event)); 
-        }
-    }, []);
+    // // Right Controller (Right grip) - test
+    // useXRInputSourceEvent('all', 'squeezestart', (event) => {
+    //     if (event.inputSource.handedness == 'right'){
+    //         console.log('Squeeze Event:', event);
+    //         console.log('Squueez pro:', Object.keys(event)); 
+    //     }
+    // }, []);
 
     // useXRInputSourceEvent('all', 'selectstart', (event) => {
     //     if (event.inputSource.handedness == 'right'){
@@ -87,4 +91,6 @@ export default function DragPlane(){
                 <meshBasicMaterial transparent opacity={0} />
             </mesh>
     );
-}
+})
+
+export default DragPlane;

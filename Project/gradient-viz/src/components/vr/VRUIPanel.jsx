@@ -1,8 +1,9 @@
 import { Text } from "@react-three/drei";
 import useStore from "../../store/useStore";
 import VRButton from "./VRButton";
+import { forwardRef } from "react";
 
-export default function VRUIPanel(){
+const panelRef = forwardRef(function VRUIPanel(props, ref){
     const isVRsession = useStore((s) => s.isVRsession);
     const vrUIVisible = useStore((s) => s.vrUIVisible);
     const showVectors = useStore((s) => s.showVectors);
@@ -13,14 +14,16 @@ export default function VRUIPanel(){
     const toggleSurfaceContours = useStore((s) => s.toggleSurfaceContours);
     const setViewMode = useStore((s) => s.setViewMode);
     const viewMode = useStore((s) => s.viewMode);
+    const VRUIPanelPose = useStore((s) => s.setVRUIPanelPose);
+    const VRUIPanelRotation = useStore((s) => s.setVRUIPanelRotation);
 
     if (!isVRsession || !vrUIVisible) return null;
 
     return (
-        <group position={[0, 1.2, -1.5]}>
+        <group position={VRUIPanelPose} rotation={VRUIPanelRotation}>
             <mesh>
                 <boxGeometry args={[0.6, 0.5, 0.01]}/>
-                <meshStandardMaterial color="1a1a2e" transparent opacity={0.9}/>
+                <meshStandardMaterial color="#1a1a2e" transparent opacity={0.9}/>
             </mesh>
 
             <Text position={[0, 0.2, 0.01]} fontSize={0.04} color="white">
@@ -56,4 +59,4 @@ export default function VRUIPanel(){
             />
         </group>
     )
-}
+})
