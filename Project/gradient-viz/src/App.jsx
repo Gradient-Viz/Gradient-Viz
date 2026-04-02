@@ -16,7 +16,11 @@ import VRMiniMap from './components/vr/VRMiniMap';
 import { useRef } from 'react';
 import VRControllerInteraction from './components/vr/VRControllerInteraction';
 
-const xrStore = createXRStore();
+const xrStore = createXRStore({
+  offerSession: false,
+  enterGrantedSession: false,
+  emulate: false,
+});
 
 function App() {
 
@@ -29,7 +33,7 @@ function App() {
         {!isVRsession && <UIOverlay />}
         <VRsessionManager xrStore={xrStore} />
         <div style={{ position: 'absolute', left: isVRsession ? 0 : '310px', top: 0, right: 0, bottom: 0}}>
-          <Canvas camera={{position:[5,4,5], fov:50}}>
+          <Canvas key={isVRsession ? 'vr' : 'web'} camera={{position:[5,4,5], fov:50}}>
             <XR store={xrStore}>
               <directionalLight position={[5,10,5]} intensity={1}/>
               <axesHelper args={[4]} />
@@ -42,7 +46,9 @@ function App() {
               <PersonMarker />
               <CameraController />
               <DragPlane ref={dragPlaneRef}/>
-              <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef}/>
+              {isVRsession && (
+                <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef}/>
+              )}
               <ambientLight intensity={0.4}/>
               <EffectComposer>
                 <Bloom
