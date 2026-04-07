@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Text } from "@react-three/drei";
-import { flattenJSON } from "three/src/animation/AnimationUtils.js";
+
 
 export default function VRToggle({
+
     position = [0,0,0],
     label = "Toggle",
     value = false,
@@ -51,8 +52,8 @@ export default function VRToggle({
                 position={[-width / 2, 0, 0.012]}
                 fontSize={0.023}
                 color={labelColor}
-                anchorX={left}
-                anchorY={middle}
+                anchorX="left"
+                anchorY="middle"
             >
                 {label}
             </Text>
@@ -62,7 +63,7 @@ export default function VRToggle({
                 onPointerEnter={() => !disabled && setHovered(true)}
                 onPointerLeave={() => {
                     setHovered(false);
-                    setHovered(false);
+                    setPressed(false);
                 }}
                 onPointerDown={() => !disabled && setPressed(true)}
                 onPointerUp={handlePointerUp}

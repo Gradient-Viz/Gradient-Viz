@@ -2,6 +2,8 @@ import { Text } from "@react-three/drei";
 import useStore from "../../store/useStore";
 import VRButton from "./VRButton";
 import { forwardRef } from "react";
+import VRToggle from "./VRToggle";
+import VRSlider from "./VRSlider";
 
 const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
     const isVRsession = useStore((s) => s.isVRsession);
@@ -17,6 +19,11 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
     const vrUIPanelPosition = useStore((s) => s.vrUIPanelPosition);
     const vrUIPanelRotation = useStore((s) => s.vrUIPanelRotation);
 
+    const personPosition = useStore((s) => s.personPosition);
+    const setPersonPosition = useStore((s) => s.setPersonPosition);
+    const domainMin = useStore((s) => s.domainMin);
+    const domainMax = useStore((s) => s.domainMax);
+
     if (!isVRsession || !vrUIVisible) return null;
 
     return (
@@ -30,32 +37,58 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
                 Gradient Viz Controls
             </Text>
 
-            <VRButton
-                position={[-0.15, 0.1, 0.01]}
-                label={showVectors ? "Vectors: ON" : "Vectors: OFF"}
-                onClick={toggleVectors}
-                width={0.25}
+            <VRToggle
+                position={[0,0.23, 0.01]}
+                label="Vectors"
+                value={showVectors}
+                onToggle={toggleVectors}
+                width={0.50}
             />
 
-            <VRButton
-                position={[-0.15, 0.02, 0.01]}
-                label={showGroundContours ? "Ground: ON" : "Ground: OFF"}
-                onClick={toggleGroundContours}
-                width={0.25}
-            />
-
-            <VRButton
-                position={[-0.15, -0.06, 0.01]}
-                label={showSurfaceContours ? "Surface: ON" : "Surface: OFF"}
-                onClick={toggleSurfaceContours}
-                width={0.25}
+            <VRToggle
+                position={[0,0.14, 0.01]}
+                label="Ground Contours"
+                value={showGroundContours}
+                onToggle={toggleGroundContours}
+                width={0.50}
             /> 
 
+            <VRToggle
+                position={[0,0.05, 0.01]}
+                label="Surface Contours"
+                value={showSurfaceContours}
+                onToggle={toggleSurfaceContours}
+                width={0.50}
+            /> 
+
+            <VRSlider
+                position={[0,-0.20, 0.01]}
+                label="X Position"
+                min={domainMin}
+                max={domainMax}
+                step={0.1}
+                value={personPosition[0]}
+                onChange={(x) => setPersonPosition([x, personPosition[1]])}
+                width={0.42}
+            />                
+            <VRSlider
+                position={[0,-0.30, 0.01]}
+                label="Y Position"
+                min={domainMin}
+                max={domainMax}
+                step={0.1}
+                value={personPosition[1]}
+                onChange={(y) => setPersonPosition([personPosition[0], y])}
+                width={0.42}
+            />  
+
             <VRButton
-                position={[-0.15, -0.14, 0.01]}
-                label={viewMode === '3d_explore' ? '2D View' : '3D View'}
-                onClick={() => setViewMode(viewMode === "3d_explore" ? "2d_explore" : "3d_explore")}
-                width={0.25} 
+                position={[0,-0.31, 0.01]}
+                label={viewMode === "3d_explore" ? "Switch to 2D view" : "Switch to 3D view"}
+                onClick={() => 
+                    setViewMode(viewMode === "3d_explore" ? "2d_explore" : "3d_explore")
+                }
+                width={0.50}
             />
         </group>
     );
