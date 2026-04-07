@@ -88,7 +88,7 @@ const DragPlane = forwardRef(function DragPlane(props, ref){
             onPointerLeave={handlePointerUp}
             >
                 <planeGeometry args={[domainMax - domainMin, domainMax - domainMin]} />
-                <meshBasicMaterial color="#ff3b6b" transparent opacity={0.2} />
+                <meshBasicMaterial transparent opacity={0} />
             </mesh>
     );
 })
