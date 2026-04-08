@@ -19,7 +19,7 @@ export default function VRSessionManager({ xrStore }){
 
     useEffect(() =>{
         const unsubcribe = xrStore.subscribe((state) => {
-            setIsVRsession(state.session !== null);
+            setIsVRsession(!!state.session);
         });
         return unsubcribe;
     }, [setIsVRsession, xrStore]);
