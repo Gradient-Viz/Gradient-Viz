@@ -29,16 +29,16 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
     return (
         <group ref={ref} position={vrUIPanelPosition} rotation={vrUIPanelRotation}>
             <mesh>
-                <boxGeometry args={[0.6, 0.5, 0.01]}/>
+                <boxGeometry args={[0.72, 0.78, 0.01]}/>
                 <meshStandardMaterial color="#1a1a2e" transparent opacity={0.9}/>
             </mesh>
 
             <Text position={[0, 0.2, 0.01]} fontSize={0.04} color="white">
-                Gradient Viz Controls
+                Controls
             </Text>
 
             <VRToggle
-                position={[0,0.23, 0.01]}
+                position={[0,0.13, 0.01]}
                 label="Vectors"
                 value={showVectors}
                 onToggle={toggleVectors}
@@ -46,7 +46,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
             />
 
             <VRToggle
-                position={[0,0.14, 0.01]}
+                position={[0,-0.04, 0.01]}
                 label="Ground Contours"
                 value={showGroundContours}
                 onToggle={toggleGroundContours}
@@ -62,7 +62,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
             /> 
 
             <VRSlider
-                position={[0,-0.20, 0.01]}
+                position={[0,-0.14, 0.01]}
                 label="X Position"
                 min={domainMin}
                 max={domainMax}
@@ -72,7 +72,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
                 width={0.42}
             />                
             <VRSlider
-                position={[0,-0.30, 0.01]}
+                position={[0,-0.20, 0.01]}
                 label="Y Position"
                 min={domainMin}
                 max={domainMax}
