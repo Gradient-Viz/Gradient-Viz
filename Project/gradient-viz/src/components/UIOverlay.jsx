@@ -3,6 +3,7 @@ import useStore from '../store/useStore';
 import douglasLogo from '../assets/logo.png';
 import { setUserFunction, f, gradient, gradientMagnitude } from '../utils/math';
 import './UIOverlay.css'; 
+import Contour2DPanel from './Contour2DPanel';
 export default function UIOverlay(){
     const viewMode = useStore((s) => s.viewMode);
     const setViewMode = useStore((s) => s.setViewMode);
@@ -74,6 +75,12 @@ export default function UIOverlay(){
                     Graph
                 </button>
                 {funcError && <p className="func-error">Invalid function. Use JavaScript math syntax.</p>}
+            </div>
+
+            {/* 2D contour map */}
+            <div className="section-card">
+                <span className="section-label">2D Contour Map</span>
+                <Contour2DPanel />
             </div>
 
             {/* Display Toggles */}
