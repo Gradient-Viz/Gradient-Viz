@@ -24,21 +24,43 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
 
+    const showAscentPath = useStore((s) => s.showAscentPath);
+    const ascentProgress = useStore((s) => s.ascentProgress);
+    const setAscentProgress = useStore((s) => s.setAscentProgress);
+    const setShowAscentPath = useStore((s) => s.setShowAscentPath);
+    const reset = useStore((s) => s.reset);
+
+
     if (!isVRsession || !vrUIVisible) return null;
+
+    const canSwitchTo2D = viewMode === "3d_explore";
+    const canTraceAscent = viewMode === "2d_explore" && !showAscentPath;
+    const canReturnTo3D = 
+        viewMode === "2d_explore" && showAscentPath && ascentProgress >= 1;
+    const canReset = viewMode === "3d_compare";
+
+    const handleSwitchTo2D = () => setViewMode("2d_explore");
+    const handleTraceAscent = () => {
+        setAscentProgress(0);
+        setShowAscentPath(true);
+    }
+    const handleReturnTo3D = () => setViewMode("3d_compare");
+    const handleReset = () => reset();
+
 
     return (
         <group ref={ref} position={vrUIPanelPosition} rotation={vrUIPanelRotation}>
             <mesh>
-                <boxGeometry args={[0.72, 0.78, 0.01]}/>
+                <boxGeometry args={[0.76, 1.16, 0.01]}/>
                 <meshStandardMaterial color="#1a1a2e" transparent opacity={0.9}/>
             </mesh>
 
-            <Text position={[0, 0.2, 0.01]} fontSize={0.04} color="white">
+            <Text position={[0, 0.5, 0.01]} fontSize={0.04} color="white">
                 Controls
             </Text>
 
             <VRToggle
-                position={[0,0.13, 0.01]}
+                position={[0,0.38, 0.01]}
                 label="Vectors"
                 value={showVectors}
                 onToggle={toggleVectors}
@@ -46,7 +68,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
             />
 
             <VRToggle
-                position={[0,-0.04, 0.01]}
+                position={[0,0.29, 0.01]}
                 label="Ground Contours"
                 value={showGroundContours}
                 onToggle={toggleGroundContours}
@@ -54,7 +76,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
             /> 
 
             <VRToggle
-                position={[0,0.05, 0.01]}
+                position={[0,0.20, 0.01]}
                 label="Surface Contours"
                 value={showSurfaceContours}
                 onToggle={toggleSurfaceContours}
@@ -62,7 +84,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
             /> 
 
             <VRSlider
-                position={[0,-0.14, 0.01]}
+                position={[0,0.08, 0.01]}
                 label="X Position"
                 min={domainMin}
                 max={domainMax}
@@ -72,7 +94,7 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
                 width={0.42}
             />                
             <VRSlider
-                position={[0,-0.20, 0.01]}
+                position={[0,-0.02, 0.01]}
                 label="Y Position"
                 min={domainMin}
                 max={domainMax}
@@ -83,13 +105,41 @@ const VRUIPanel = forwardRef(function VRUIPanel(_, ref){
             />  
 
             <VRButton
-                position={[0,-0.31, 0.01]}
-                label={viewMode === "3d_explore" ? "Switch to 2D view" : "Switch to 3D view"}
-                onClick={() => 
-                    setViewMode(viewMode === "3d_explore" ? "2d_explore" : "3d_explore")
-                }
-                width={0.50}
+                position={[0,-0.15, 0.01]}
+                label = "Switch to 2D View"
+                onClick={handleSwitchTo2D}
+                disabled={!canSwitchTo2D}
+                width={0.56}
             />
+
+            <VRButton
+                position={[0,-0.23, 0.01]}
+                label = "Trace Ascent"
+                onClick={handleTraceAscent}
+                disabled={!canTraceAscent}
+                width={0.56}
+            />
+            <VRButton
+                position={[0,-0.31, 0.01]}
+                label = "Return to 3D compare"
+                onClick={handleReturnTo3D}
+                disabled={!canReturnTo3D}
+                width={0.56}
+            />
+
+            <VRButton
+                position={[0,-0.39, 0.01]}
+                label = "Reset"
+                onClick={handleReset}
+                disabled={!canReset}
+                width={0.56}
+            />
+
+            {showAscentPath && viewMode === "2d_explore" && ascentProgress < 1 && (
+                <Text position={[0,-0.50, 0.01]} fontSize={0.022} color="#c7d2fe">
+                    Tracing Ascent.... {Math.round(ascentProgress * 100)}%
+                </Text>
+            )}
         </group>
     );
 });

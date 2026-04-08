@@ -63,16 +63,21 @@ export default function VRSlider({
 
     const handlePointerDown = (e) => {
         if (disabled) return;
+        e.stopPropagation();
         setPressed(true);
+        e.target.setPointerCapture?.(e.pointerId);
         setFromPointX(e.point.x - position[0]);
     };
 
-    const handlePointerUp = () => {
+    const handlePointerUp = (e) => {
+        e.stopPropagation();
         setPressed(false);
+        e.target.releasePointerCapture?.(e.pointerId);
     };
 
     const handlePointerMove = (e) =>{
         if(!pressed || disabled) return;
+        e.stopPropagation();
         setFromPointX(e.point.x - position[0]);
     };
 
@@ -108,6 +113,7 @@ export default function VRSlider({
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
+                onPointerMissed={handlePointerUp}
             >
                 <boxGeometry args={[trackWidth, trackHeight, trackDepth]}/>
                 <meshStandardMaterial color={trackColor}/>
