@@ -68,24 +68,12 @@ export default function VRSessionManager({ xrStore }){
 
     return (
         <button
+            className={`vr-session-toggle ${isVRsession ? 'is-active' : ''}`}
             onClick={toggleVr}
             disabled={busy}
-            style={{
-                position: 'fixed',
-                bottom: 20,
-                right: 20,
-                padding: '12px 24px',
-                fontSize: '16px',
-                background: isVRsession ? '#c84d4d' : '#4a90d9',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: busy ? 'not-allowed' : 'pointer',
-                opacity: busy ? 0.7 : 1,
-                zIndex: 1000,
-            }}
         >
-            {busy ? 'Switching...' : isVRsession ? 'Exit VR' : 'Enter VR'}
+            <span className="vr-session-dot" />
+            {busy ? 'Switching...' : isVRsession ? 'Exit VR Session' : 'Enter VR'}
         </button>
     );
 }

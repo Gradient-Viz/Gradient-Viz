@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import useStore from '../store/useStore';
 import { forwardRef, useImperativeHandle } from 'react';
 
-const DragPlane = forwardRef(function DragPlane(props, ref){
+const DragPlane = forwardRef(function DragPlane(_props, ref){
     const meshRef = useRef();
 
     useImperativeHandle(ref, () => meshRef.current);
@@ -11,7 +11,7 @@ const DragPlane = forwardRef(function DragPlane(props, ref){
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
-    // const interactionMode = useStore((s) => s.interactionMode);
+    const interactionMode = useStore((s) => s.interactionMode);
 
     const [dragging, setDragging] = useState(false);
 
@@ -23,6 +23,7 @@ const DragPlane = forwardRef(function DragPlane(props, ref){
     
     //Click mode (3D)
     const handleClick = (e) =>{
+        if (isVRsession || interactionMode !== 'click') return;
         if (e.shiftKey) return;
         e.stopPropagation();
         updatePosition(e);
@@ -33,8 +34,9 @@ const DragPlane = forwardRef(function DragPlane(props, ref){
         if(isVRsession){
             setDragging(true);
             updatePosition(e);
-        }else{
-        //only work when SHIFT is held
+        } else {
+            // In non-VR drag mode, only track while SHIFT is pressed.
+            if (interactionMode !== 'drag') return;
             if (!e.shiftKey) return;
             setDragging(true);
             updatePosition(e);
@@ -43,7 +45,7 @@ const DragPlane = forwardRef(function DragPlane(props, ref){
 
     const handlePointerMove = (e) => {
         if (!dragging) return;
-        if (!isVRsession && !e.shiftKey) return;
+        if (!isVRsession && (interactionMode !== 'drag' || !e.shiftKey)) return;
 
         e.stopPropagation();
         updatePosition(e);
@@ -52,29 +54,6 @@ const DragPlane = forwardRef(function DragPlane(props, ref){
     const handlePointerUp = () => {
         setDragging(false);
     };
-
-    // // Right Trigger (select) - place marker
-    // useXRInputSourceEvent('all', 'selectstart', (event) => {
-    //     if (event.inputSource.handedness === 'right'){
-    //       console.log('XR Event:', Object.keys(event));
-    //       console.log('Event pro:', Object.keys(event)); 
-    //     }
-    // }, []);
-
-    // // Right Controller (Right grip) - test
-    // useXRInputSourceEvent('all', 'squeezestart', (event) => {
-    //     if (event.inputSource.handedness == 'right'){
-    //         console.log('Squeeze Event:', event);
-    //         console.log('Squueez pro:', Object.keys(event)); 
-    //     }
-    // }, []);
-
-    // useXRInputSourceEvent('all', 'selectstart', (event) => {
-    //     if (event.inputSource.handedness == 'right'){
-    //         setDragging(false);
-    //     }
-    // }, []);
-
 
     return (
         <mesh

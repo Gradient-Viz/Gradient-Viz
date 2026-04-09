@@ -36,23 +36,24 @@ export default function GradientArrows(){
     const showVectors = useStore((s) => s.showVectors);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
+    const viewMode = useStore((s) => s.viewMode);
 
     const samplePoints = useMemo(() => {
         const points = [];
-        const step = 0.5; // one arrow per unit
+        const step = viewMode === '2d_explore' ? 0.8 : 1;
         for(let x = domainMin; x <= domainMax; x+= step){
             for(let y = domainMin; y <= domainMax; y += step){
                 points.push([x,y]);
             }
         }
         return points;
-    }, [domainMin, domainMax]);
+    }, [domainMin, domainMax, viewMode]);
 
     if (!showVectors) return null;
 
     return (
         <group>
-            <GradientArrow x={personPosition[0]} y={personPosition[1]} color='#FFFF00'/>
+            <GradientArrow x={personPosition[0]} y={personPosition[1]} color='#ffe66a'/>
             {samplePoints.map(([x,y], i) => (
                 <GradientArrow key={i} x={x} y={y} />
             ))}

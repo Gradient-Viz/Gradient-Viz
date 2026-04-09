@@ -1,10 +1,11 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import useStore from "../store/useStore";
 import { generateContours, autoContourLevels, gradientAscentPath } from "../utils/math";
 
 export default function Contour2DPanel() {
     const zoom = 2.5;
     const canvasRef = useRef();
+    const [isDragging, setIsDragging] = useState(false);
 
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
@@ -57,10 +58,40 @@ export default function Contour2DPanel() {
 
         ctx.clearRect(0, 0, size, size);
 
+        ctx.fillStyle = "#454040";
+        ctx.fillRect(0, 0, size, size);
+
+        const gridStep = size / 8;
+        ctx.strokeStyle = "rgba(216, 211, 101, 0.16)";
+        ctx.lineWidth = 1;
+        for (let i = 1; i < 8; i++) {
+            const p = i * gridStep;
+            ctx.beginPath();
+            ctx.moveTo(0, p);
+            ctx.lineTo(size, p);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(p, 0);
+            ctx.lineTo(p, size);
+            ctx.stroke();
+        }
+
+        const center = size / 2;
+        ctx.strokeStyle = "rgba(230, 240, 130, 0.33)";
+        ctx.beginPath();
+        ctx.moveTo(center, 0);
+        ctx.lineTo(center, size);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, center);
+        ctx.lineTo(size, center);
+        ctx.stroke();
+
         const levels = autoContourLevels(domainMin, domainMax, domainMin, domainMax);
         const contours = generateContours(levels, domainMin, domainMax, domainMin, domainMax, 100);
 
-        const colors = ['#1f6f8b', '#58C4DD', '#a8d8ea', '#f5f6fa'];
+        const colors = ['#d8d365', '#e6f082', '#d8d365', '#f3f7b7'];
         ctx.lineWidth = 1;
 
         contours.forEach((contour, i) => {
@@ -82,6 +113,8 @@ export default function Contour2DPanel() {
             const visiblePath = path2D.slice(0, count);
 
             ctx.beginPath();
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
 
             visiblePath.forEach(([x, y], i) => {
                 const [sx, sy] = domainToScreen(x, y);
@@ -89,47 +122,71 @@ export default function Contour2DPanel() {
                 else ctx.lineTo(sx, sy);
             });
 
-            ctx.strokeStyle = "#ff6b6b"; // same as 3D
+            ctx.strokeStyle = "#e6f082";
             ctx.lineWidth = 2;
+            ctx.shadowColor = "rgba(230, 240, 130, 0.55)";
+            ctx.shadowBlur = 6;
             ctx.stroke();
+            ctx.shadowBlur = 0;
         }
 
-        //Draw current position
+        // Draw current position marker with glow ring.
         const [px, py] = domainToScreen(personPosition[0], personPosition[1]);
 
         ctx.beginPath();
+        ctx.arc(px, py, 9, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(230, 240, 130, 0.24)";
+        ctx.fill();
+
+        ctx.beginPath();
         ctx.arc(px, py, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "#4a90d9";
+        ctx.fillStyle = "#e6f082";
         ctx.fill();
 
     }, [domainMin, domainMax, personPosition, functionVersion, showAscentPath, ascentProgress, domainToScreen]);
 
-    //Interaction
-    const handlePointer = (e) => {
+    const clampDomain = useCallback(
+        (value) => Math.max(domainMin, Math.min(domainMax, value)),
+        [domainMin, domainMax]
+    );
+
+    const handlePointer = useCallback((e) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
         const [dx, dy] = screenToDomain(x, y);
-        const clamp = (e) => Math.max(domainMin, Math.min(domainMax, e));
-        setPersonPosition([clamp(dx), clamp(dy)]);
+        setPersonPosition([clampDomain(dx), clampDomain(dy)]);
+    }, [screenToDomain, setPersonPosition, clampDomain]);
+
+    const handlePointerDown = (e) => {
+        canvasRef.current?.setPointerCapture?.(e.pointerId);
+        setIsDragging(true);
+        handlePointer(e);
+    };
+
+    const handlePointerMove = (e) => {
+        if (!isDragging) return;
+        handlePointer(e);
+    };
+
+    const handlePointerUp = (e) => {
+        if (canvasRef.current?.hasPointerCapture?.(e.pointerId)) {
+            canvasRef.current.releasePointerCapture(e.pointerId);
+        }
+        setIsDragging(false);
     };
 
     return (
         <canvas
             ref={canvasRef}
+            className="contour-canvas"
             width={size}
             height={size}
-            onPointerDown={handlePointer}
-            onPointerMove={(e) => e.buttons === 1 && handlePointer(e)}
-            style={{
-                width: "100%",
-                marginTop: "10px",
-                borderRadius: "8px",
-                border: "1px solid #444",
-                background: "#0f172a",
-                cursor: "crosshair"
-            }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
         />
     );
 }

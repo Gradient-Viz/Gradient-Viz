@@ -1,42 +1,119 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.app-shell {
+  --sidebar-width: 360px;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 14% 14%, rgba(230, 240, 130, 0.16), transparent 46%),
+    radial-gradient(circle at 85% 84%, rgba(216, 211, 101, 0.16), transparent 44%),
+    linear-gradient(165deg, #454040 0%, #605b51 100%);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.app-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(216, 211, 101, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(216, 211, 101, 0.04) 1px, transparent 1px);
+  background-size: 58px 58px;
+  opacity: 0.28;
+  z-index: 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.canvas-shell {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: left 0.34s ease;
+}
+
+.app-shell.has-sidebar .canvas-shell {
+  left: var(--sidebar-width);
+}
+
+.app-shell.is-vr .canvas-shell {
+  left: 0;
+}
+
+.canvas-shell canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  outline: none;
+}
+
+.vr-session-toggle {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 154px;
+  padding: 10px 14px;
+  border: 1px solid rgba(230, 240, 130, 0.38);
+  border-radius: 999px;
+  color: #f7f5dd;
+  font-family: 'Sora', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, rgba(69, 64, 64, 0.94), rgba(96, 91, 81, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 24px rgba(35, 31, 31, 0.4);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.vr-session-toggle:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(230, 240, 130, 0.68);
+  box-shadow: 0 16px 30px rgba(35, 31, 31, 0.48);
+}
+
+.vr-session-toggle:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.vr-session-toggle.is-active {
+  border-color: rgba(216, 211, 101, 0.72);
+  background: linear-gradient(135deg, rgba(96, 91, 81, 0.95), rgba(69, 64, 64, 0.95));
+}
+
+.vr-session-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e6f082;
+  box-shadow: 0 0 0 5px rgba(230, 240, 130, 0.2);
+}
+
+.vr-session-toggle.is-active .vr-session-dot {
+  background: #d8d365;
+  box-shadow: 0 0 0 5px rgba(216, 211, 101, 0.22);
+}
+
+@media (max-width: 1200px) {
+  .app-shell {
+    --sidebar-width: 332px;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+@media (max-width: 900px) {
+  .app-shell.has-sidebar .canvas-shell {
+    left: 0;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .vr-session-toggle {
+    right: 12px;
+    bottom: 12px;
+    min-width: 138px;
+    padding: 9px 12px;
+    font-size: 12px;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

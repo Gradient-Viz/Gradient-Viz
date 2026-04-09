@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useStore from '../store/useStore';
 import douglasLogo from '../assets/logo.png';
-import { setUserFunction, f, gradient, gradientMagnitude } from '../utils/math';
-import './UIOverlay.css'; 
+import { setUserFunction, f, gradient } from '../utils/math';
+import './UIOverlay.css';
 import Contour2DPanel from './Contour2DPanel';
-export default function UIOverlay(){
+
+export default function UIOverlay() {
     const viewMode = useStore((s) => s.viewMode);
     const setViewMode = useStore((s) => s.setViewMode);
     const personPosition = useStore((s) => s.personPosition);
@@ -12,9 +13,11 @@ export default function UIOverlay(){
     const toggleVectors = useStore((s) => s.toggleVectors);
     const showAscentPath = useStore((s) => s.showAscentPath);
     const ascentProgress = useStore((s) => s.ascentProgress);
+    const surfacePathProgress = useStore((s) => s.surfacePathProgress);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const setShowAscentPath = useStore((s) => s.setShowAscentPath);
     const setAscentProgress = useStore((s) => s.setAscentProgress);
+    const setSurfacePathProgress = useStore((s) => s.setSurfacePathProgress);
     const toggleGroundContours = useStore((s) => s.toggleGroundContours);
     const toggleSurfaceContours = useStore((s) => s.toggleSurfaceContours);
     const showGroundContours = useStore((s) => s.showGroundContours);
@@ -29,202 +32,232 @@ export default function UIOverlay(){
     const [funcText, setFuncText] = useState('(7*x*y)/exp(x^2+y^2)');
     const [funcError, setFuncError] = useState(false);
 
-    const handleFunctionChange = (e)  => {
+    const canSwitchTo2D = viewMode === '3d_explore' || viewMode === '3d_compare';
+    const canTraceAscent = viewMode === '2d_explore' && (!showAscentPath || ascentProgress >= 1);
+    const canReturnTo3D = viewMode === '2d_explore' && showAscentPath && ascentProgress >= 1;
+    const canReset = viewMode !== '3d_explore' || showAscentPath || surfacePathProgress > 0;
+    const traceLabel = showAscentPath && ascentProgress >= 1 ? 'Trace Again' : 'Trace Ascent';
+    const progressPercent = Math.round(ascentProgress * 100);
+
+    const modeLabel = useMemo(() => {
+        if (viewMode === '3d_explore') return 'Mode: 3D Explore';
+        if (viewMode === '2d_explore' && showAscentPath && ascentProgress < 1) return 'Mode: 2D Tracing';
+        if (viewMode === '2d_explore') return 'Mode: 2D Explore';
+        return 'Mode: 3D Compare';
+    }, [viewMode, showAscentPath, ascentProgress]);
+
+    const handleFunctionChange = (e) => {
         setFuncText(e.target.value);
-    }
+    };
 
     const handleApplyFunction = () => {
         const success = setUserFunction(funcText);
         setFuncError(!success);
-        if (success){
+        if (success) {
             incrementFunctionVersion();
             reset();
+            setSurfacePathProgress(0);
         }
     };
 
     const handleSwitchTo2D = () => setViewMode('2d_explore');
+
     const handleTraceAscent = () => {
+        setViewMode('2d_explore');
         setAscentProgress(0);
+        setSurfacePathProgress(0);
         setShowAscentPath(true);
     };
 
-    const handleReturnTo3D = () => setViewMode('3d_compare');
+    const handleReturnTo3D = () => {
+        setSurfacePathProgress(0);
+        setViewMode('3d_compare');
+    };
+
     const handleReset = () => reset();
 
+    const grad = gradient(personPosition[0], personPosition[1]);
+    const gradMagnitude = Math.hypot(grad[0], grad[1]);
+
     return (
-        <div className='sidebar'>
-            {/* Header */}
+        <aside className="sidebar" aria-label="Gradient visualizer controls">
             <div className="sidebar-header">
                 <img src={douglasLogo} alt="Douglas College" />
-                <h3>Gradient Visualizer</h3>
+                <h2>Gradient Visualizer</h2>
+                <span className="mode-pill">{modeLabel}</span>
             </div>
 
-            {/* Function input */}
-            <div className="section-card">
-                <span className="section-label">Function</span>
-                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: '#888' }}>
-                    z = f(x,y)
-                </span>
-                <input
-                    className={`func-input ${funcError ? 'error' : ''}`}
-                    value={funcText}
-                    onChange={handleFunctionChange}
-                    onKeyDown={(e) => e.key === 'Enter' && handleApplyFunction()}
-                />
-                <button className="btn-primary" onClick={handleApplyFunction}>
-                    Graph
-                </button>
-                {funcError && <p className="func-error">Invalid function. Use JavaScript math syntax.</p>}
-            </div>
-
-            {/* 2D contour map */}
-            <div className="section-card">
-                <span className="section-label">2D Contour Map</span>
-                <Contour2DPanel />
-            </div>
-
-            {/* Display Toggles */}
-            <div className="section-card">
-                <span className="section-label">Display</span>
-                <div className="btn-group">
-                    <button
-                        className={`btn-toggle ${showGroundContours ? 'active' : ''}`}
-                        onClick={toggleGroundContours}
-                    >
-                        Ground Contours
-                        <span className="toggle-dot"/>
-                    </button>
-                    <button
-                        className={`btn-toggle ${showSurfaceContours ? 'active' : ''}`}
-                        onClick={toggleSurfaceContours}
-                    >
-                        Surface Contours
-                        <span className="toggle-dot" />
-                    </button>
-                    <button
-                        className={`btn-toggle ${showVectors ? 'active' : ''}`}
-                        onClick={toggleVectors}
-                    >
-                        Gradient Vectors
-                        <span className="toggle-dot" />
-                    </button>
-                    <button
-                        className={`btn-toggle ${interactionMode == 'click' ? 'active' : ''}`}
-                        onClick={() => setInteractionMode(interactionMode === 'click' ? 'drag' : 'click')}
-                    >
-                        {interactionMode === 'click' ? 'Click Move' : 'Drag Trace'}
-                        <span className="toggle-dot" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Person position sliders */}
-            <div className="section-card">
-                <span className="section-label">Person Position</span>
-
-                <div className="slider-row">
-                    <div className="slider-label">
-                        <span>x</span>
-                        <span className="slider-value">{personPosition[0].toFixed(2)}</span>
-                    </div>
+            <div className="sidebar-scroll">
+                <div className="section-card">
+                    <span className="section-label">Function</span>
+                    <p className="subtle-help">Use JavaScript math syntax for z = f(x, y).</p>
                     <input
-                        type="range"
-                        min={domainMin}
-                        max={domainMax}
-                        step={0.1}
-                        value={personPosition[0]}
-                        onChange={(e) => setPersonPosition([parseFloat(e.target.value), personPosition[1]])}
+                        className={`func-input ${funcError ? 'error' : ''}`}
+                        value={funcText}
+                        onChange={handleFunctionChange}
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyFunction()}
                     />
+                    <button className="btn-primary" onClick={handleApplyFunction}>
+                        Update Surface
+                    </button>
+                    {funcError && (
+                        <p className="func-error">
+                            Invalid function. Try expressions like: sin(x)*cos(y), exp(-0.2*(x^2+y^2)).
+                        </p>
+                    )}
                 </div>
 
-                <div className="slider-row">
-                    <div className="slider-label">
-                        <span>y</span>
-                        <span className="slider-value">{personPosition[1].toFixed(2)}</span>
+                <div className="section-card">
+                    <span className="section-label">2D Contour Map</span>
+                    <p className="subtle-help">Click or drag inside the map to reposition the explorer.</p>
+                    <Contour2DPanel />
+                </div>
+
+                <div className="section-card">
+                    <span className="section-label">Display</span>
+                    <div className="btn-group">
+                        <button
+                            className={`btn-toggle ${showGroundContours ? 'active' : ''}`}
+                            onClick={toggleGroundContours}
+                        >
+                            Ground Contours
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${showSurfaceContours ? 'active' : ''}`}
+                            onClick={toggleSurfaceContours}
+                        >
+                            Surface Contours
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${showVectors ? 'active' : ''}`}
+                            onClick={toggleVectors}
+                        >
+                            Gradient Vectors
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${interactionMode === 'click' ? 'active' : ''}`}
+                            onClick={() => setInteractionMode(interactionMode === 'click' ? 'drag' : 'click')}
+                        >
+                            {interactionMode === 'click' ? 'Interaction: Click to Place' : 'Interaction: Shift + Drag'}
+                            <span className="toggle-dot" />
+                        </button>
                     </div>
-                    <input
-                        type="range"
-                        min={domainMin}
-                        max={domainMax}
-                        step={0.1}
-                        value={personPosition[1]}
-                        onChange={(e) => setPersonPosition([personPosition[0], parseFloat(e.target.value)])}
-                    /> 
-                </div>
-            </div>
-
-            {/* Computed Values */}
-            <div className="computed-card">
-                <div>
-                    f({personPosition[0].toFixed(2)}, {personPosition[1].toFixed(2)}) ={' '}
-                    <span className="val-cyan">{f(personPosition[0], personPosition[1]).toFixed(4)}</span>
-                </div>
-                <div>
-                    ∇f ={' '}
-                    <span className="val-yellow">
-                        [{gradient(personPosition[0], personPosition[1]).map(v => v.toFixed(4)).join(', ')}]
-                    </span>
-                </div>
-                <div>
-                    |∇f| ={' '}
-                    <span className="val-orange">{gradientMagnitude(personPosition[0], personPosition[1]).toFixed(4)}</span>
-                </div>
-            </div>
-
-        {/*Animation Controls */}
-        <div className="section-card">
-            <span className="section-label">Animation Controls</span>
-            <div className="btn-group">
-                <button 
-                    className={`btn-primary ${viewMode !== '3d_explore' ? 'disabled' : ''}`}
-                    onClick={handleSwitchTo2D}
-                    disabled={viewMode !== '3d_explore'}
-                >
-                    Switch to 2D View
-                </button>
-                <button 
-                    className={`btn-primary ${viewMode !== '2d_explore' || showAscentPath ? 'disabled' : ''}`}
-                    onClick={handleTraceAscent}
-                    disabled={viewMode !== '2d_explore' || showAscentPath}
-                >
-                    Trace Ascent
-                </button>
-                <button 
-                    className={`btn-primary ${viewMode !== '2d_explore' || !showAscentPath || ascentProgress < 1 ? 'disabled' : ''}`}
-                    onClick={handleReturnTo3D}
-                    disabled={viewMode !== '2d_explore' || !showAscentPath || ascentProgress < 1}
-                >
-                    Return to 3D
-                </button>
-                <button 
-                    className={`btn-primary ${viewMode !== '3d_compare' ? 'disabled' : ''}`}
-                    onClick={handleReset}
-                    disabled={viewMode !== '3d_compare'}
-                >
-                    Reset
-                </button>
-            </div>
-            {showAscentPath && ascentProgress < 1 && viewMode === '2d_explore' && (
-                <div style={{ marginTop: '12px' }}>
-                    <div className="progress-container">
-                        <div
-                            className="progress-fill"
-                            style={{ width: `${Math.round(ascentProgress * 100)}%` }}
-                        />
-                    </div>
-                    <p className="progress-text">
-                        Tracing path... {Math.round(ascentProgress * 100)}%
+                    <p className="subtle-help">
+                        {interactionMode === 'click'
+                            ? 'Click mode places the marker directly on the surface plane.'
+                            : 'Drag mode allows smooth scrubbing while holding SHIFT in 3D.'}
                     </p>
                 </div>
-            )}
-        </div>
 
-        {/* Info */}
-        <div className="info-hint">
-            {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
-            {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
-            {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
-        </div>
-    </div>
+                <div className="section-card">
+                    <span className="section-label">Person Position</span>
+
+                    <div className="slider-row">
+                        <div className="slider-label">
+                            <span>x</span>
+                            <span className="slider-value">{personPosition[0].toFixed(2)}</span>
+                        </div>
+                        <input
+                            type="range"
+                            min={domainMin}
+                            max={domainMax}
+                            step={0.1}
+                            value={personPosition[0]}
+                            onChange={(e) => setPersonPosition([parseFloat(e.target.value), personPosition[1]])}
+                        />
+                    </div>
+
+                    <div className="slider-row">
+                        <div className="slider-label">
+                            <span>y</span>
+                            <span className="slider-value">{personPosition[1].toFixed(2)}</span>
+                        </div>
+                        <input
+                            type="range"
+                            min={domainMin}
+                            max={domainMax}
+                            step={0.1}
+                            value={personPosition[1]}
+                            onChange={(e) => setPersonPosition([personPosition[0], parseFloat(e.target.value)])}
+                        />
+                    </div>
+                </div>
+
+                <div className="computed-card">
+                    <div>
+                        f({personPosition[0].toFixed(2)}, {personPosition[1].toFixed(2)}) ={' '}
+                        <span className="val-cyan">{f(personPosition[0], personPosition[1]).toFixed(4)}</span>
+                    </div>
+                    <div>
+                        ∇f = <span className="val-yellow">[{grad.map((v) => v.toFixed(4)).join(', ')}]</span>
+                    </div>
+                    <div>
+                        |∇f| = <span className="val-orange">{gradMagnitude.toFixed(4)}</span>
+                    </div>
+                </div>
+
+                <div className="section-card">
+                    <span className="section-label">Animation Controls</span>
+                    <p className="subtle-help">
+                        Workflow: 3D Explore → 2D Trace → 3D Compare. You can replay without full reset.
+                    </p>
+
+                    <div className="btn-group">
+                        <button
+                            className={`btn-primary ${!canSwitchTo2D ? 'disabled' : ''}`}
+                            onClick={handleSwitchTo2D}
+                            disabled={!canSwitchTo2D}
+                        >
+                            Switch to 2D View
+                        </button>
+
+                        <button
+                            className={`btn-primary ${!canTraceAscent ? 'disabled' : ''}`}
+                            onClick={handleTraceAscent}
+                            disabled={!canTraceAscent}
+                        >
+                            {traceLabel}
+                        </button>
+
+                        <button
+                            className={`btn-primary ${!canReturnTo3D ? 'disabled' : ''}`}
+                            onClick={handleReturnTo3D}
+                            disabled={!canReturnTo3D}
+                        >
+                            Return to 3D Compare
+                        </button>
+
+                        <button
+                            className={`btn-secondary ${!canReset ? 'disabled' : ''}`}
+                            onClick={handleReset}
+                            disabled={!canReset}
+                        >
+                            Reset Scene
+                        </button>
+                    </div>
+
+                    {showAscentPath && ascentProgress < 1 && viewMode === '2d_explore' && (
+                        <div className="progress-block">
+                            <div className="progress-container">
+                                <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
+                            </div>
+                            <p className="progress-text">Tracing path... {progressPercent}%</p>
+                        </div>
+                    )}
+                </div>
+
+                <div className="info-hint">
+                    {viewMode === '3d_explore' &&
+                        '3D Explore: orbit to inspect terrain shape and move the marker with click mode or SHIFT+drag mode.'}
+                    {viewMode === '2d_explore' &&
+                        '2D Explore: use the contour map for precise placement, then run Trace Ascent to animate the climb.'}
+                    {viewMode === '3d_compare' &&
+                        '3D Compare: pink shows the flat ascent path and cyan shows the same path lifted onto the surface.'}
+                </div>
+            </div>
+        </aside>
     );
 }

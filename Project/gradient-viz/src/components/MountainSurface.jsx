@@ -55,18 +55,20 @@ export default function MountainSurface() {
                     vertexColors
                     side={THREE.DoubleSide}
                     transparent
-                    opacity={0.6}
-                    roughness={0.7}
-                    metalness={0.1}
+                    opacity={0.76}
+                    roughness={0.52}
+                    metalness={0.08}
+                    emissive="#041725"
+                    emissiveIntensity={0.34}
                 />
             </mesh>
             {/*Wireframe overlay*/}
             <mesh geometry={geometry}>
                 <meshBasicMaterial
-                    color= "#00ffcc"
+                    color= "#7ee5f8"
                     wireframe
                     transparent
-                    opacity={0.3}
+                    opacity={0.18}
                     toneMapped={false}
                 />
             </mesh>

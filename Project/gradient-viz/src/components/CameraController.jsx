@@ -21,6 +21,9 @@ export default function CameraController(){
          const config = CAMERA_POSITIONS[viewMode]; 
          if (!config || !controlsRef.current) return;
 
+        gsap.killTweensOf(camera.position);
+        gsap.killTweensOf(controlsRef.current.target);
+
         gsap.to(camera.position, {
             x: config.pos[0],
             y: config.pos[1],
@@ -28,7 +31,8 @@ export default function CameraController(){
             duration: 1.5,
             ease: 'power2.inOut',
             onUpdate: () => {
-                camera.lookAt(config.target[0], config.target[1], config.target[2])
+                camera.lookAt(config.target[0], config.target[1], config.target[2]);
+                controlsRef.current?.update();
             },
             onComplete: () =>{
                 // Re-enable controls
@@ -43,8 +47,9 @@ export default function CameraController(){
             y: config.target[1],
             z: config.target[2],
             duration: 1,
-            ease: 'power2.inOut'
-        })
+            ease: 'power2.inOut',
+            onUpdate: () => controlsRef.current?.update(),
+        });
     }, [viewMode, camera]);
 
 
@@ -73,7 +78,13 @@ export default function CameraController(){
         <OrbitControls
             ref={controlsRef}
             enabled={!isShiftPressed && viewMode !== '2d_explore'}
+            enableDamping
+            dampingFactor={0.08}
+            enablePan={viewMode !== '2d_explore'}
             enableRotate={viewMode !== '2d_explore'}
+            rotateSpeed={0.75}
+            minDistance={2}
+            maxDistance={24}
             maxPolarAngle={viewMode === '2d_explore' ? 0 : Math.PI}
         />
     );
