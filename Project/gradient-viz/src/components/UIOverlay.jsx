@@ -97,7 +97,7 @@ export default function UIOverlay() {
             setVectorCountText(String(vectorCount));
             return;
         }
-        const clamped = Math.max(6, Math.min(24, parsed));
+        const clamped = Math.max(6, Math.min(36, parsed));
         setVectorCount(clamped);
         setVectorCountText(String(clamped));
     };
@@ -252,7 +252,7 @@ export default function UIOverlay() {
                                 <input
                                     type="range"
                                     min={6}
-                                    max={24}
+                                    max={36}
                                     step={1}
                                     value={vectorCount}
                                     onChange={(e) => setVectorCount(parseInt(e.target.value, 10))}
