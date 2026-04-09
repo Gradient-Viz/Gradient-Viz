@@ -4,7 +4,7 @@ import useStore from '../store/useStore';
 
 export default function PersonMarker(){
     const personPosition = useStore((s) => s.personPosition);
-    const functionVersion = useStore((s) => s.functionVersion);
+    //const functionVersion = useStore((s) => s.functionVersion);
     const [px, py] = personPosition;
     const height = f(px, py);
 
