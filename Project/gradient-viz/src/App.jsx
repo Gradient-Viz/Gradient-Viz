@@ -34,7 +34,14 @@ function App() {
       <VRSessionManager xrStore={xrStore} />
 
       <div className="canvas-shell">
-        <Canvas key={isVRsession ? 'vr' : 'web'} camera={{ position: [5, 4, 5], fov: 50 }} dpr={[1, 2]}>
+        <Canvas 
+          camera={{ position: [5, 4, 5], fov: 50 }} 
+          dpr={[1, 2]}
+          gl={{antialias: true, alpha: false, preserveDrawingBuffer: true }}
+          onCreated={ ({ gl }) => {
+            gl.setClearColor('#05070d', 1);
+          }} 
+        >
           <XR store={xrStore}>
             <color attach="background" args={['#05070d']} />
             <fog attach="fog" args={['#05070d', 8, 28]} />
@@ -52,12 +59,7 @@ function App() {
             <PersonMarker />
             <CameraController />
             <DragPlane ref={dragPlaneRef} />
-
-            {isVRsession && (
-              <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef} />
-            )}
-
-            {!isVRsession && (
+            <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef} />(
               <EffectComposer>
                 <Bloom
                   intensity={0.9}
@@ -66,7 +68,6 @@ function App() {
                   mipmapBlur
                 />
               </EffectComposer>
-            )}
           </XR>
         </Canvas>
       </div>
