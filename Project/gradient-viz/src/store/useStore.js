@@ -10,6 +10,7 @@ const useStore = createWithEqualityFn((set) => ({
     gridLines: 256,
     domainMin: -6,
     domainMax: 6,
+    vectorCount: 13,
     functionVersion: 0,
     showGroundContours: false,
     showSurfaceContours: true,
@@ -33,6 +34,18 @@ const useStore = createWithEqualityFn((set) => ({
     setGridLines: (n) => set({gridLines: n}),
     setDomainMin: (val) => set({domainMin: val}),
     setDomainMax: (val) => set({domainMax: val}),
+    setVectorCount: (n) => set({vectorCount: n}),
+    setDomainHalfRange: (halfRange) => set((state) => {
+        const min = -halfRange;
+        const max = halfRange;
+        const [px, py] = state.personPosition;
+        const clamp = (value) => Math.max(min, Math.min(max, value));
+        return {
+            domainMin: min,
+            domainMax: max,
+            personPosition: [clamp(px), clamp(py)],
+        };
+    }),
     toggleGroundContours: () => set((s) => ({ showGroundContours: !s.showGroundContours })),
     toggleSurfaceContours: () => set((s) =>  ({ showSurfaceContours: !s.showSurfaceContours })),
     toggleVectors: () => set((s) => ({ showVectors: !s.showVectors })),

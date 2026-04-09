@@ -36,18 +36,23 @@ export default function GradientArrows(){
     const showVectors = useStore((s) => s.showVectors);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
-    const viewMode = useStore((s) => s.viewMode);
+    const vectorCount = useStore((s) => s.vectorCount);
 
     const samplePoints = useMemo(() => {
         const points = [];
-        const step = viewMode === '2d_explore' ? 0.8 : 1;
-        for(let x = domainMin; x <= domainMax; x+= step){
-            for(let y = domainMin; y <= domainMax; y += step){
-                points.push([x,y]);
+        const clampedCount = Math.max(2, Math.floor(vectorCount));
+        const span = domainMax - domainMin;
+        const step = span / (clampedCount - 1);
+
+        for (let ix = 0; ix < clampedCount; ix += 1) {
+            const x = domainMin + ix * step;
+            for (let iy = 0; iy < clampedCount; iy += 1) {
+                const y = domainMin + iy * step;
+                points.push([x, y]);
             }
         }
         return points;
-    }, [domainMin, domainMax, viewMode]);
+    }, [domainMin, domainMax, vectorCount]);
 
     if (!showVectors) return null;
 

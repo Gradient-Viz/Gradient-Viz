@@ -57,7 +57,7 @@ export default function MountainSurface() {
                     transparent
                     opacity={0.76}
                     roughness={0.52}
-                    metalness={0.08}
+                    metalness={0.10}
                     emissive="#041725"
                     emissiveIntensity={0.34}
                 />
@@ -65,10 +65,10 @@ export default function MountainSurface() {
             {/*Wireframe overlay*/}
             <mesh geometry={geometry}>
                 <meshBasicMaterial
-                    color= "#7ee5f8"
+                    color= "#2fc8f6"
                     wireframe
                     transparent
-                    opacity={0.18}
+                    opacity={0.50}
                     toneMapped={false}
                 />
             </mesh>

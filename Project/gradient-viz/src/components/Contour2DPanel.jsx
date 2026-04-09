@@ -58,11 +58,11 @@ export default function Contour2DPanel() {
 
         ctx.clearRect(0, 0, size, size);
 
-        ctx.fillStyle = "#454040";
+        ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, size, size);
 
         const gridStep = size / 8;
-        ctx.strokeStyle = "rgba(216, 211, 101, 0.16)";
+        ctx.strokeStyle = "rgba(196, 214, 0, 0.16)";
         ctx.lineWidth = 1;
         for (let i = 1; i < 8; i++) {
             const p = i * gridStep;
@@ -78,7 +78,7 @@ export default function Contour2DPanel() {
         }
 
         const center = size / 2;
-        ctx.strokeStyle = "rgba(230, 240, 130, 0.33)";
+        ctx.strokeStyle = "rgba(196, 214, 0, 0.33)";
         ctx.beginPath();
         ctx.moveTo(center, 0);
         ctx.lineTo(center, size);
@@ -91,7 +91,7 @@ export default function Contour2DPanel() {
         const levels = autoContourLevels(domainMin, domainMax, domainMin, domainMax);
         const contours = generateContours(levels, domainMin, domainMax, domainMin, domainMax, 100);
 
-        const colors = ['#d8d365', '#e6f082', '#d8d365', '#f3f7b7'];
+        const colors = ['#9cab00', '#b8c900', '#c4d600', '#d6e553'];
         ctx.lineWidth = 1;
 
         contours.forEach((contour, i) => {
@@ -122,9 +122,9 @@ export default function Contour2DPanel() {
                 else ctx.lineTo(sx, sy);
             });
 
-            ctx.strokeStyle = "#e6f082";
+            ctx.strokeStyle = "#c4d600";
             ctx.lineWidth = 2;
-            ctx.shadowColor = "rgba(230, 240, 130, 0.55)";
+            ctx.shadowColor = "rgba(196, 214, 0, 0.55)";
             ctx.shadowBlur = 6;
             ctx.stroke();
             ctx.shadowBlur = 0;
@@ -135,12 +135,12 @@ export default function Contour2DPanel() {
 
         ctx.beginPath();
         ctx.arc(px, py, 9, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(230, 240, 130, 0.24)";
+        ctx.fillStyle = "rgba(196, 214, 0, 0.24)";
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(px, py, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "#e6f082";
+        ctx.fillStyle = "#c4d600";
         ctx.fill();
 
     }, [domainMin, domainMax, personPosition, functionVersion, showAscentPath, ascentProgress, domainToScreen]);

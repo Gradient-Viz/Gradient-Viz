@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useStore from '../store/useStore';
 import douglasLogo from '../assets/logo.png';
 import { setUserFunction, f, gradient } from '../utils/math';
@@ -24,13 +24,20 @@ export default function UIOverlay() {
     const showSurfaceContours = useStore((s) => s.showSurfaceContours);
     const reset = useStore((s) => s.reset);
     const incrementFunctionVersion = useStore((s) => s.incrementFunctionVersion);
+    const gridLines = useStore((s) => s.gridLines);
+    const setGridLines = useStore((s) => s.setGridLines);
+    const vectorCount = useStore((s) => s.vectorCount);
+    const setVectorCount = useStore((s) => s.setVectorCount);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
+    const setDomainHalfRange = useStore((s) => s.setDomainHalfRange);
     const interactionMode = useStore((s) => s.interactionMode);
     const setInteractionMode = useStore((s) => s.setInteractionMode);
 
     const [funcText, setFuncText] = useState('(7*x*y)/exp(x^2+y^2)');
     const [funcError, setFuncError] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [vectorCountText, setVectorCountText] = useState(String(vectorCount));
 
     const canSwitchTo2D = viewMode === '3d_explore' || viewMode === '3d_compare';
     const canTraceAscent = viewMode === '2d_explore' && (!showAscentPath || ascentProgress >= 1);
@@ -78,6 +85,22 @@ export default function UIOverlay() {
 
     const grad = gradient(personPosition[0], personPosition[1]);
     const gradMagnitude = Math.hypot(grad[0], grad[1]);
+    const planeSize = useMemo(() => domainMax - domainMin, [domainMin, domainMax]);
+
+    useEffect(() => {
+        setVectorCountText(String(vectorCount));
+    }, [vectorCount]);
+
+    const applyVectorCountText = () => {
+        const parsed = Number.parseInt(vectorCountText, 10);
+        if (Number.isNaN(parsed)) {
+            setVectorCountText(String(vectorCount));
+            return;
+        }
+        const clamped = Math.max(6, Math.min(24, parsed));
+        setVectorCount(clamped);
+        setVectorCountText(String(clamped));
+    };
 
     return (
         <aside className="sidebar" aria-label="Gradient visualizer controls">
@@ -150,6 +173,93 @@ export default function UIOverlay() {
                             ? 'Click mode places the marker directly on the surface plane.'
                             : 'Drag mode allows smooth scrubbing while holding SHIFT in 3D.'}
                     </p>
+                </div>
+
+                <div className="section-card">
+                    <div className="settings-toggle-row">
+                        <span className="section-label settings-label">Settings</span>
+                        <button
+                            type="button"
+                            className="settings-toggle-btn"
+                            onClick={() => setShowSettings((open) => !open)}
+                        >
+                            {showSettings ? 'Hide' : 'Open'}
+                        </button>
+                    </div>
+                    <p className="subtle-help">Adjust scene scale, surface detail, and vector density.</p>
+
+                    {showSettings && (
+                        <div className="settings-panel">
+                            <div className="slider-row">
+                                <div className="slider-label">
+                                    <span>Plane Size</span>
+                                    <span className="slider-value">{planeSize.toFixed(1)}</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={6}
+                                    max={24}
+                                    step={0.5}
+                                    value={planeSize}
+                                    onChange={(e) => {
+                                        const nextSize = parseFloat(e.target.value);
+                                        setDomainHalfRange(nextSize / 2);
+                                    }}
+                                />
+                            </div>
+
+                            <div className="slider-row">
+                                <div className="slider-label">
+                                    <span>Surface Segments</span>
+                                    <span className="slider-value">{gridLines}</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={32}
+                                    max={320}
+                                    step={16}
+                                    value={gridLines}
+                                    onChange={(e) => setGridLines(parseInt(e.target.value, 10))}
+                                />
+                            </div>
+
+                            <div className="slider-row">
+                                <div className="slider-label">
+                                    <span>Gradient Arrows</span>
+                                    <div className="settings-input-group">
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            className="settings-number-input"
+                                            value={vectorCountText}
+                                            onChange={(e) => {
+                                                const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 2);
+                                                setVectorCountText(digitsOnly);
+                                            }}
+                                            onBlur={applyVectorCountText}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    applyVectorCountText();
+                                                }
+                                            }}
+                                            aria-label="Gradient arrow count"
+                                        />
+                                        <span className="slider-value">{vectorCount}x{vectorCount}</span>
+                                    </div>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={6}
+                                    max={24}
+                                    step={1}
+                                    value={vectorCount}
+                                    onChange={(e) => setVectorCount(parseInt(e.target.value, 10))}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="section-card">
