@@ -11,6 +11,8 @@ export default function VRMiniMap(){
     const personPosition = useStore((s) => s.personPosition);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
+    const showAscentPath = useStore((s) => s.showAscentPath);
+    const ascentProgress = useStore((s) => s.ascentProgress);
 
     const { scene } = useThree();
 
@@ -22,7 +24,19 @@ export default function VRMiniMap(){
         magFilter: THREE.LinearFilter,
     });
 
-    const orthroCamera = useMemo(() =>{
+    const statusText = !showAscentPath
+        ? "Ready to trace ascent"
+        : ascentProgress < 1
+        ? "Tracing ascent... " + (Math.round(ascentProgress * 100)) + "%"
+        : "Trace complete. Return to 3D to compare.";
+
+    const markerColor = !showAscentPath
+        ? "#ff4444"
+        : ascentProgress < 1
+        ? "#ffaa00"
+        : "#44ff88";
+        
+    const orthoCamera = useMemo(() =>{
         const size = (domainMax - domainMin) / 2;
         const cam = new THREE.OrthographicCamera(-size, size, size, -size, 0.1, 50);
         cam.position.set(0, 15, 0);
@@ -42,7 +56,7 @@ export default function VRMiniMap(){
         }
 
         gl.setRenderTarget(fbo);
-        gl.render(scene, orthroCamera);
+        gl.render(scene, orthoCamera);
         gl.setRenderTarget(null);
 
         if(minimapRef.current){
@@ -50,8 +64,9 @@ export default function VRMiniMap(){
         }
         
         if(markerRef.current){
-            const normalizedX = (personPosition[0] - domainMin) / (domainMax - domainMin);
-            const normalizedZ = (personPosition[1] - domainMin) / (domainMax - domainMin);
+            const range = domainMax - domainMin || 1;
+            const normalizedX = (personPosition[0] - domainMin) / (range);
+            const normalizedZ = (personPosition[1] - domainMin) / (range);
             markerRef.current.position.x = (normalizedX - 0.5) * 0.55;
             markerRef.current.position.y = (0.5 - normalizedZ ) * 0.55;
         }
@@ -72,16 +87,16 @@ export default function VRMiniMap(){
 
             <mesh position={[0,0, 0.001]}>
                 <planeGeometry args={[0.55, 0.55]} />
-                <meshBasicMaterial map={fbo.texture} />    
+                <meshBasicMaterial map={fbo.texture} />
             </mesh>
 
             <mesh ref={markerRef} position={[0, 0, 0.01]} >
                 <circleGeometry args={[0.015, 16]} />
-                <meshBasicMaterial color="#ff4444" />    
+                <meshBasicMaterial color={markerColor} />    
             </mesh>
 
             <Text position={[0, -0.35, 0]} fontSize={0.02} color="#888">
-                Tracing Path ....
+                {statusText}
             </Text>
         </group>
     );

@@ -19,7 +19,6 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
     const setVRRightGripActive = useStore((s) => s.setVRRightGripActive);
     const vrLeftGripActive = useStore((s) => s.vrLeftGripActive);
     const setVRLeftGripActive = useStore((s) => s.setVRLeftGripActive);
-    //const vrUIPanelPosition = useStore((s) => s.vrUIPanelPosition);
     const setVRUIPanelPose = useStore((s) => s.setVRUIPanelPose);
     const vrUIPanelRotation = useStore((s) => s.vrUIPanelRotation);
 
@@ -27,7 +26,19 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
     const leftController = useXRInputSourceState("controller", "left");
     const raycasterRef = useRef(new THREE.Raycaster());
     const tempMatrixRef = useRef(new THREE.Matrix4());
+    
     const panelOffsetRef = useRef(new THREE.Vector3());
+    const panelTargetPosRef = useRef(new THREE.Vector3());
+    const panelCurrentPosRef = useRef(new THREE.Vector3());
+
+    const rightSmoothedPointRef = useRef(null);
+    const lastPersonPosRef = useRef([Number.NaN, Number.NaN]);
+    const aPressedRef = useRef(false);
+
+    const RIGHT_SMOOTH = 0.35;
+    const PANEL_SMOOTH = 0.2;
+    const UPDATE_EPSILON = 0.002;
+
 
     const clampXZ = (point) => {
         const x = Math.max(domainMin, Math.min(domainMax, point.x));
@@ -35,7 +46,20 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
        return [x, z];
     };
 
-    const raycastetoDragPlane = (controllerState) => {
+    const updatePersonFromPoint = (point) => {
+        const [x, z] = clampXZ(point);
+        const [lastX, lastZ] = lastPersonPosRef.current;
+
+        if(
+            Number.isNaN(lastX) || 
+            Math.abs(x - lastX) > UPDATE_EPSILON || Math.abs(z - lastZ) > UPDATE_EPSILON
+        ){
+            setPersonPosition([x,z]);
+            lastPersonPosRef.current = [x, z];
+        }
+    };
+
+    const raycastToDragPlane = (controllerState) => {
         const plane = dragPlaneRef?.current;
         const controllerObject = controllerState?.object;
         if(!plane || !controllerObject) return null;
@@ -59,7 +83,7 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
             if(!isVRsession) return;
             if (event.inputSource.handedness !== "right") return;
 
-            const hit = raycastetoDragPlane(rightController);
+            const hit = raycastToDragPlane(rightController);
             if(!hit) return;
 
             setPersonPosition(clampXZ(hit));
@@ -74,6 +98,8 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
 
             if(event.inputSource.handedness === "right"){
                 setVRRightGripActive(true);
+                const hit = raycastToDragPlane(rightController);
+                rightSmoothedPointRef.current = hit ? hit.clone() : null;
             } 
 
             if(event.inputSource.handedness === "left"){
@@ -90,7 +116,7 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
 
                 panelOffsetRef.current.copy(panelWorld).sub(controllerWorld);
             }
-        },[isVRsession, leftController]
+        },[isVRsession, leftController, rightController]
     );
 
     useXRInputSourceEvent(
@@ -101,6 +127,7 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
 
             if(event.inputSource.handedness === "right"){
                 setVRRightGripActive(false);
+                rightSmoothedPointRef.current = null;
             }
 
             if(event.inputSource.handedness === 'left'){
@@ -111,15 +138,27 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
 
     useXRControllerButtonEvent(rightController, "a-button", (state) => {
         if (!isVRsession) return;
-        if (state === "pressed") toggleVRUI();
+        if (state === "pressed" && !aPressedRef.current) {
+            toggleVRUI();
+            aPressedRef.current = true;
+        }
+
+        if (state !== "pressed"){
+            aPressedRef.current = false;
+        }
     });
 
     useFrame(() => {
         if (!isVRsession) return;
         if(vrRightGripActive){
-            const hit = raycastetoDragPlane(rightController);
+            const hit = raycastToDragPlane(rightController);
             if(hit){
-                setPersonPosition(clampXZ(hit));
+                if(!rightSmoothedPointRef.current){
+                    rightSmoothedPointRef.current = hit.clone();
+                }else{
+                    rightSmoothedPointRef.current.lerp(hit, RIGHT_SMOOTH);
+                }
+                updatePersonFromPoint(rightSmoothedPointRef.current);
             }
         }
         
@@ -131,10 +170,12 @@ export default function VRControllerInteraction({ dragPlaneRef, panelRef }){
             const controllerWorld = new THREE.Vector3();
             leftObject.getWorldPosition(controllerWorld);
 
-            const targetPos = controllerWorld.add(panelOffsetRef.current);
+            panelTargetPosRef.current.copy(controllerWorld).add(panelOffsetRef.current);
+            panelCurrentPosRef.current.lerp(panelTargetPosRef.current, PANEL_SMOOTH);
+
 
             setVRUIPanelPose(
-                [targetPos.x, targetPos.y, targetPos.z],
+                [panelCurrentPosRef.current.x,panelCurrentPosRef.current.y,panelCurrentPosRef.current.z ],
                 vrUIPanelRotation
             );
         }

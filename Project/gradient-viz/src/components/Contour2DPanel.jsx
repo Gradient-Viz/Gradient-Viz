@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import useStore from "../store/useStore";
 import { generateContours, autoContourLevels, gradientAscentPath } from "../utils/math";
 
@@ -18,7 +18,7 @@ export default function Contour2DPanel() {
     const size = 260;
 
     //Convert domain to screen
-    const domainToScreen = (x, y) => {
+    const domainToScreen = useCallback((x, y) => {
         const center = (domainMin + domainMax) / 2;
 
         const scaledX = (x - center) * zoom + center;
@@ -31,10 +31,10 @@ export default function Contour2DPanel() {
             nx * size,
             (1 - ny) * size
         ];
-    };
+    }, [domainMin, domainMax, size, zoom]);
 
     //Convert screen to domain
-    const screenToDomain = (x, y) => {
+    const screenToDomain = useCallback((x, y) => {
         const nx = x / size;
         const ny = y / size;
 
@@ -47,17 +47,13 @@ export default function Contour2DPanel() {
         const dy = (scaledY - center) / zoom + center;
 
         return [dx, dy];
-    };
-
-    //Compute ascent path
-    const path2D = useMemo(() => {
-        return gradientAscentPath(personPosition[0], personPosition[1]);
-    }, [personPosition]);
+    }, [domainMin, domainMax, size, zoom]);
 
     //Draw contours
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
+        const path2D = gradientAscentPath(personPosition[0], personPosition[1]);
 
         ctx.clearRect(0, 0, size, size);
 
@@ -106,7 +102,7 @@ export default function Contour2DPanel() {
         ctx.fillStyle = "#4a90d9";
         ctx.fill();
 
-    }, [domainMin, domainMax, personPosition, functionVersion, showAscentPath, ascentProgress, path2D]);
+    }, [domainMin, domainMax, personPosition, functionVersion, showAscentPath, ascentProgress, domainToScreen]);
 
     //Interaction
     const handlePointer = (e) => {

@@ -6,7 +6,7 @@ import AscentPaths from "./components/AscentPaths";
 import PersonMarker from "./components/PersonMarker";
 import CameraController from "./components/CameraController";
 import UIOverlay from './components/UIOverlay';
-import VRsessionManager from './components/vr/VRSessionManager';
+import VRSessionManager from './components/vr/VRSessionManager';
 import DragPlane from './components/DragPlane';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import {XR, createXRStore } from '@react-three/xr';
@@ -31,7 +31,7 @@ function App() {
   return (
       <div style={{width:'100vw', height:'100vh', background:'#000000'}}>
         {!isVRsession && <UIOverlay />}
-        <VRsessionManager xrStore={xrStore} />
+        <VRSessionManager xrStore={xrStore} />
         <div style={{ position: 'absolute', left: isVRsession ? 0 : '310px', top: 0, right: 0, bottom: 0}}>
           <Canvas key={isVRsession ? 'vr' : 'web'} camera={{position:[5,4,5], fov:50}}>
             <XR store={xrStore}>
@@ -50,6 +50,7 @@ function App() {
                 <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef}/>
               )}
               <ambientLight intensity={0.4}/>
+              {!isVRsession && (
               <EffectComposer>
                 <Bloom
                   intensity={1.5}
@@ -58,6 +59,7 @@ function App() {
                   mipmapBlur
                 />
               </EffectComposer>  
+              )}
             </XR>
           </Canvas>
         </div>

@@ -1,5 +1,5 @@
-import {create} from 'zustand';
-const useStore = create((set) => ({
+import { createWithEqualityFn } from 'zustand/traditional';
+const useStore = createWithEqualityFn((set) => ({
     // State
     viewMode: '3d_explore',
     personPosition: [1.0, 1.0],
