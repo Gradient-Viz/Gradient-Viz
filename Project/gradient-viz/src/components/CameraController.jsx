@@ -3,7 +3,7 @@ import { useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { PointerLockControls } from '@react-three/drei';
 import gsap from 'gsap';
-import useStore from '../store/useStore';
+import useStore from '../store/useStore.js';
 import { useFrame } from '@react-three/fiber';
 import { f } from '../utils/math';
 import * as THREE from 'three';
@@ -63,9 +63,10 @@ export default function CameraController(){
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
 
-        gsap.killTweensOf(camera.position);
-        gsap.killTweensOf(controlsRef.current.target);
-
+        if (controlsRef.current) {
+          gsap.killTweensOf(camera.position);
+          gsap.killTweensOf(controlsRef.current.target);
+        }
         gsap.to(camera.position, {
             x: config.pos[0],
             y: config.pos[1],
@@ -102,12 +103,15 @@ export default function CameraController(){
 
 
     useEffect(() => {
+        if (typeof window === 'undefined') return;
         if (viewMode !== 'first_person') return;
 
         const handleKeyDown = (e) => { keys.current[e.key] = true; };
         const handleKeyUp = (e) => { keys.current[e.key] = false; };
         
         const handleClick = () => {
+          if (typeof window === 'undefined') return null;
+            
           if (document.pointerLockElement !== document.body) {
             document.body.requestPointerLock();
           }
@@ -174,12 +178,12 @@ export default function CameraController(){
     });
 
     if (isVRsession) return null;
-  
-    if (viewMode === "first_person") {
-      return <PointerLockControls />;
-    }
-
-    return (
+    
+    if (typeof window === 'undefined') return;
+    
+    return viewMode === "first_person" ? (
+      <PointerLockControls />
+    ) : (
         <OrbitControls
             ref={controlsRef}
             enabled={!isShiftPressed && viewMode !== '2d_explore'}
