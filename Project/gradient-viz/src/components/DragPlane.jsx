@@ -1,9 +1,13 @@
 import { useRef, useState } from 'react';
 import useStore from '../store/useStore';
+import { forwardRef, useImperativeHandle } from 'react';
 
-export default function DragPlane(){
+const DragPlane = forwardRef(function DragPlane(_props, ref){
     const meshRef = useRef();
 
+    useImperativeHandle(ref, () => meshRef.current);
+
+    const isVRsession = useStore((s) => s.isVRsession);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
@@ -19,6 +23,7 @@ export default function DragPlane(){
     
     //Click mode (3D)
     const handleClick = (e) =>{
+        if (isVRsession || interactionMode !== 'click') return;
         if (e.shiftKey) return;
         e.stopPropagation();
         updatePosition(e);
@@ -26,16 +31,22 @@ export default function DragPlane(){
 
     //Drag mode (trace ascent)
     const handlePointerDown = (e) => {
-        //only work when SHIFT is held
-        if (!e.shiftKey)
-            return;
-        e.stopPropagation();
-        setDragging(true);
-        updatePosition(e);
+        if(isVRsession){
+            setDragging(true);
+            updatePosition(e);
+        } else {
+            // In non-VR drag mode, only track while SHIFT is pressed.
+            if (interactionMode !== 'drag') return;
+            if (!e.shiftKey) return;
+            setDragging(true);
+            updatePosition(e);
+        }
     };
 
     const handlePointerMove = (e) => {
-        if (!dragging || !e.shiftKey) return;
+        if (!dragging) return;
+        if (!isVRsession && (interactionMode !== 'drag' || !e.shiftKey)) return;
+
         e.stopPropagation();
         updatePosition(e);
     };
@@ -59,4 +70,6 @@ export default function DragPlane(){
                 <meshBasicMaterial transparent opacity={0} />
             </mesh>
     );
-}
+})
+
+export default DragPlane;

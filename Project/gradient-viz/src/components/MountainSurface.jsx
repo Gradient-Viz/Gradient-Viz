@@ -12,7 +12,8 @@ export default function MountainSurface() {
     const SIZE = domainMax - domainMin;
     const SEGMENTS = gridLines;
 
-    const geometry = useMemo(() => {
+    const geometry = useMemo(() => { 
+        void functionVersion;
         const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
         const pos = geo.attributes.position;
         const colors = new Float32Array(pos.count * 3);
@@ -44,7 +45,7 @@ export default function MountainSurface() {
         geo.computeVertexNormals(); 
         return geo;
 
-    }, [domainMin, domainMax, gridLines, functionVersion]);
+    }, [SIZE, SEGMENTS, functionVersion]);
     // make y = z
     return (
         <group>
@@ -54,18 +55,20 @@ export default function MountainSurface() {
                     vertexColors
                     side={THREE.DoubleSide}
                     transparent
-                    opacity={0.6}
-                    roughness={0.7}
-                    metalness={0.1}
+                    opacity={0.76}
+                    roughness={0.52}
+                    metalness={0.40}
+                    emissive="#041725"
+                    emissiveIntensity={0.40}
                 />
             </mesh>
             {/*Wireframe overlay*/}
             <mesh geometry={geometry}>
                 <meshBasicMaterial
-                    color= "#00ffcc"
+                    color= "#2fc8f6"
                     wireframe
                     transparent
-                    opacity={0.3}
+                    opacity={0.50}
                     toneMapped={false}
                 />
             </mesh>

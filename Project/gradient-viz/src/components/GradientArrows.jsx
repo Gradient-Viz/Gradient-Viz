@@ -36,23 +36,29 @@ export default function GradientArrows(){
     const showVectors = useStore((s) => s.showVectors);
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
+    const vectorCount = useStore((s) => s.vectorCount);
 
     const samplePoints = useMemo(() => {
         const points = [];
-        const step = 0.5; // one arrow per unit
-        for(let x = domainMin; x <= domainMax; x+= step){
-            for(let y = domainMin; y <= domainMax; y += step){
-                points.push([x,y]);
+        const clampedCount = Math.max(2, Math.floor(vectorCount));
+        const span = domainMax - domainMin;
+        const step = span / (clampedCount - 1);
+
+        for (let ix = 0; ix < clampedCount; ix += 1) {
+            const x = domainMin + ix * step;
+            for (let iy = 0; iy < clampedCount; iy += 1) {
+                const y = domainMin + iy * step;
+                points.push([x, y]);
             }
         }
         return points;
-    }, [domainMin, domainMax]);
+    }, [domainMin, domainMax, vectorCount]);
 
     if (!showVectors) return null;
 
     return (
         <group>
-            <GradientArrow x={personPosition[0]} y={personPosition[1]} color='#FFFF00'/>
+            <GradientArrow x={personPosition[0]} y={personPosition[1]} color='#ffe66a'/>
             {samplePoints.map(([x,y], i) => (
                 <GradientArrow key={i} x={x} y={y} />
             ))}

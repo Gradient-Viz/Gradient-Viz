@@ -8,7 +8,6 @@ import { useFrame } from '@react-three/fiber';
 import { f } from '../utils/math';
 import * as THREE from 'three';
 
-window.keysPressed = {};
 const CAMERA_HEIGHT = 0.5;
 
 const CAMERA_POSITIONS = {
@@ -19,12 +18,14 @@ const CAMERA_POSITIONS = {
 };
 
 export default function CameraController(){
+    const isVRsession = useStore((s) => s.isVRsession);
     const viewMode = useStore((s) => s.viewMode);
     const personPosition = useStore((s) => s.personPosition);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const controlsRef = useRef();
     const { camera } = useThree();
     const [isShiftPressed, setIsShiftPressed] = useState(false);
+    const keys = useRef({});
 
     useEffect(() => {
          const config = CAMERA_POSITIONS[viewMode]; 
@@ -62,10 +63,8 @@ export default function CameraController(){
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
 
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
+        gsap.killTweensOf(camera.position);
+        gsap.killTweensOf(controlsRef.current.target);
 
         gsap.to(camera.position, {
             x: config.pos[0],
@@ -74,7 +73,8 @@ export default function CameraController(){
             duration: 1.5,
             ease: 'power2.inOut',
             onUpdate: () => {
-                camera.lookAt(config.target[0], config.target[1], config.target[2])
+                camera.lookAt(config.target[0], config.target[1], config.target[2]);
+                controlsRef.current?.update();
             },
             onComplete: () =>{
                 // Re-enable controls
@@ -89,30 +89,47 @@ export default function CameraController(){
             y: config.target[1],
             z: config.target[2],
             duration: 1,
-            ease: 'power2.inOut'
-        })
+            ease: 'power2.inOut',
+            onUpdate: () => controlsRef.current?.update(),
+        });
+      
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+      
     }, [viewMode, camera, personPosition]);
 
 
     useEffect(() => {
         if (viewMode !== 'first_person') return;
 
-        const handleKeyDown = (e) => { window.keysPressed[e.key] = true; };
-        const handleKeyUp = (e) => { window.keysPressed[e.key] = false; };
+        const handleKeyDown = (e) => { keys.current[e.key] = true; };
+        const handleKeyUp = (e) => { keys.current[e.key] = false; };
+        
+        const handleClick = () => {
+          if (document.pointerLockElement !== document.body) {
+            document.body.requestPointerLock();
+          }
+        };
 
+        document.addEventListener('click', handleClick);
+      
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
 
         return () => {
+            document.removeEventListener('click', handleClick);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
     }, [viewMode]);
+  
 
-    useFrame(() => {
+    useFrame((state, delta) => {
         if (viewMode !== 'first_person') return;
 
-        const speed = 0.01;
+        const speed = 2 * delta;
         const direction = new THREE.Vector3();
         const right = new THREE.Vector3();
         const up = new THREE.Vector3(0, 1, 0); // world up
@@ -127,7 +144,7 @@ export default function CameraController(){
         let moveX = 0;
         let moveZ = 0;
 
-        const pressed = window.keysPressed;
+        const pressed = keys.current;
         if (pressed['ArrowUp'] || pressed['w']) {
             moveX += direction.x * speed;
             moveZ += direction.z * speed;
@@ -156,13 +173,23 @@ export default function CameraController(){
         setPersonPosition([camera.position.x, camera.position.z]);
     });
 
-    return viewMode === "first_person" ? (
-        <PointerLockControls ref={pointerRef} />
-    ) : (
+    if (isVRsession) return null;
+  
+    if (viewMode === "first_person") {
+      return <PointerLockControls />;
+    }
+
+    return (
         <OrbitControls
             ref={controlsRef}
             enabled={!isShiftPressed && viewMode !== '2d_explore'}
+            enableDamping
+            dampingFactor={0.08}
+            enablePan={viewMode !== '2d_explore'}
             enableRotate={viewMode !== '2d_explore'}
+            rotateSpeed={0.75}
+            minDistance={2}
+            maxDistance={24}
             maxPolarAngle={viewMode === '2d_explore' ? 0 : Math.PI}
         />
     );
