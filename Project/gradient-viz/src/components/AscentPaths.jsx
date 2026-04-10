@@ -44,12 +44,12 @@ export default function AscentPaths(){
     return(
         <group>
             {/* 2D path: always visible once tracing starts*/}
-            <Line points={visibleFlat} color="#FF6B6B" lineWidth={3} />
+            <Line points={visibleFlat} color="#FF9F38" lineWidth={3} />
 
             {/* 3D path: when comparing */}
             {viewMode === '3d_compare' && surfacePathProgress > 0 && (
                 <>
-                    <Line points={visibleSurface} color="#58C4DD" lineWidth={3} />
+                    <Line points={visibleSurface} color="#B83325" lineWidth={3} />
 
                     {/*Vertical connector lines every 10 points */}
                     {visibleFlat.filter((_, i) => i % 10 === 0).map((pt, i) => {
