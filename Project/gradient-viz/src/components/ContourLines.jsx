@@ -22,7 +22,6 @@ export default function ContourLines(){
     const contours = useMemo(() => {
         const levels = autoContourLevels(domainMin, domainMax, domainMin, domainMax);
         const raw = generateContours(levels, domainMin, domainMax, domainMin, domainMax, 120);
-        void functionVersion;
         return raw.map((contour) => ({
             level: contour.level,
             segments: contour.segments.map((seg) => ({

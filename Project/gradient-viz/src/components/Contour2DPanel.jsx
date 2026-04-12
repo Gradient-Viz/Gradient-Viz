@@ -54,7 +54,7 @@ export default function Contour2DPanel() {
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
-        const path2D = gradientAscentPath(personPosition[0], personPosition[1]);
+        const path2D = showAscentPath ? gradientAscentPath(personPosition[0], personPosition[1]) : [];
 
         ctx.clearRect(0, 0, size, size);
 
