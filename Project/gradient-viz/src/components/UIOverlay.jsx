@@ -366,7 +366,7 @@ export default function UIOverlay() {
                           disabled={!canExitFirstPerson}
                         >
                           Exit First Person
-                    </button>
+                        </button>
                         
                     </div>
 
@@ -379,17 +379,15 @@ export default function UIOverlay() {
                         </div>
                     )}
                 </div>
-            )}
-        </div>
 
-        {/* Info */}
-        <div className="info-hint">
-            {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
-            {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
-            {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
-            {viewMode === 'first_person' && 'First-person camera. Use mouse to look and move along the surface.'}
+            {/* Info */}
+            <div className="info-hint">
+                {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
+                {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
+                {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
+                {viewMode === 'first_person' && 'First-person camera. Use mouse to look and move along the surface.'}
+            </div>
         </div>
-    </div>
     </aside>
     );
 }
