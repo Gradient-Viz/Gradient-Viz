@@ -23,6 +23,7 @@ export default function CameraController(){
     const personPosition = useStore((s) => s.personPosition);
     const setPersonPosition = useStore((s) => s.setPersonPosition);
     const controlsRef = useRef();
+    const pointerLockRef = useRef();
     const { camera } = useThree();
     const [isShiftPressed, setIsShiftPressed] = useState(false);
     const keys = useRef({});
@@ -41,12 +42,6 @@ export default function CameraController(){
             const startHeight = f(startX, startY) + CAMERA_HEIGHT;
 
             camera.position.set(startX, startHeight, startY);
-
-            // Look forward in the same direction the camera was already facing
-            const lookAtTarget = new THREE.Vector3();
-            camera.getWorldDirection(lookAtTarget);
-            lookAtTarget.add(camera.position);
-            camera.lookAt(lookAtTarget);
 
             return;
         }
@@ -110,11 +105,9 @@ export default function CameraController(){
         const handleKeyUp = (e) => { keys.current[e.key] = false; };
         
         const handleClick = () => {
-          if (typeof window === 'undefined') return null;
-            
-          if (document.pointerLockElement !== document.body) {
-            document.body.requestPointerLock();
-          }
+            if (pointerLockRef.current) {
+                pointerLockRef.current.lock();
+            }
         };
 
         document.addEventListener('click', handleClick);
@@ -132,6 +125,8 @@ export default function CameraController(){
 
     useFrame((state, delta) => {
         if (viewMode !== 'first_person') return;
+
+        if (!pointerLockRef.current) return;
 
         const speed = 2 * delta;
         const direction = new THREE.Vector3();
@@ -182,7 +177,7 @@ export default function CameraController(){
     if (typeof window === 'undefined') return;
     
     return viewMode === "first_person" ? (
-      <PointerLockControls />
+      <PointerLockControls ref={pointerLockRef} />
     ) : (
         <OrbitControls
             ref={controlsRef}
