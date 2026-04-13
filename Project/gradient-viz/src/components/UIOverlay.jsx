@@ -43,6 +43,8 @@ export default function UIOverlay() {
     const canTraceAscent = viewMode === '2d_explore' && (!showAscentPath || ascentProgress >= 1);
     const canReturnTo3D = viewMode === '2d_explore' && showAscentPath && ascentProgress >= 1;
     const canReset = viewMode !== '3d_explore' || showAscentPath || surfacePathProgress > 0;
+    const canEnterFirstPerson = viewMode === '3d_explore' || viewMode === '3d_compare';
+    const canExitFirstPerson = viewMode === 'first_person';
     const traceLabel = showAscentPath && ascentProgress >= 1 ? 'Trace Again' : 'Trace Ascent';
     const progressPercent = Math.round(ascentProgress * 100);
 
@@ -83,6 +85,8 @@ export default function UIOverlay() {
 
     const handleReset = () => reset();
 
+    const handleSwitchToFirstPerson = () => setViewMode('first_person');
+    const handleExitFirstPerson = () => setViewMode('3d_explore');
     const grad = gradient(personPosition[0], personPosition[1]);
     const gradMagnitude = Math.hypot(grad[0], grad[1]);
     const planeSize = useMemo(() => domainMax - domainMin, [domainMin, domainMax]);
@@ -347,6 +351,23 @@ export default function UIOverlay() {
                         >
                             Reset Scene
                         </button>
+                        
+                        <button
+                          className={`btn-primary ${!canEnterFirstPerson ? 'disabled' : ''}`}
+                          onClick={handleSwitchToFirstPerson}
+                          disabled={!canEnterFirstPerson}
+                        >
+                          Enter First Person
+                        </button>
+
+                        <button
+                          className={`btn-secondary ${!canExitFirstPerson ? 'disabled' : ''}`}
+                          onClick={handleExitFirstPerson}
+                          disabled={!canExitFirstPerson}
+                        >
+                          Exit First Person
+                        </button>
+                        
                     </div>
 
                     {showAscentPath && ascentProgress < 1 && viewMode === '2d_explore' && (
@@ -359,15 +380,14 @@ export default function UIOverlay() {
                     )}
                 </div>
 
-                <div className="info-hint">
-                    {viewMode === '3d_explore' &&
-                        '3D Explore: orbit to inspect terrain shape and move the marker with click mode or SHIFT+drag mode.'}
-                    {viewMode === '2d_explore' &&
-                        '2D Explore: use the contour map for precise placement, then run Trace Ascent to animate the climb.'}
-                    {viewMode === '3d_compare' &&
-                        '3D Compare: pink shows the flat ascent path and cyan shows the same path lifted onto the surface.'}
-                </div>
+            {/* Info */}
+            <div className="info-hint">
+                {viewMode === '3d_explore' && 'Explore the 3D surface. Drag to rotate camera, scroll to zoom, hold SHIFT and click/drag to move the explorer.'}
+                {viewMode === '2d_explore' && 'Overhead 2D view. Yellow arrows show ∇f.'}
+                {viewMode === '3d_compare' && 'Pink = 2D ascent path. Teal = 3D surface path.'}
+                {viewMode === 'first_person' && 'First-person camera. Use mouse to look and move along the surface.'}
             </div>
-        </aside>
+        </div>
+    </aside>
     );
 }

@@ -72,7 +72,7 @@ export default function AscentPaths(){
             {/* 3D path: when comparing */}
             {viewMode === '3d_compare' && surfacePathProgress > 0 && (
                 <>
-                    <Line points={visibleSurface} color="#850101" lineWidth={3} />
+                    <Line points={visibleSurface} color="#B83325" lineWidth={3} />
 
                     {arrow && (
                         <group>
