@@ -59,10 +59,11 @@ export default function MountainSurface() {
                     roughness={0.52}
                     metalness={0.40}
                     emissive="#041725"
-                    emissiveIntensity={0.40}
+                    emissiveIntensity={2}
                 />
             </mesh>
-            {/*Wireframe overlay*/}
+            {/*Wireframe overlay
+
             <mesh geometry={geometry}>
                 <meshBasicMaterial
                     color= "#2fc8f6"
@@ -72,6 +73,7 @@ export default function MountainSurface() {
                     toneMapped={false}
                 />
             </mesh>
+            */}
         </group>
     );
 }
