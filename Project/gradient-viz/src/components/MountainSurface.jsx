@@ -8,6 +8,9 @@ export default function MountainSurface() {
     const domainMax = useStore((s) => s.domainMax);
     const gridLines = useStore((s) => s.gridLines);
     const functionVersion = useStore((s) => s.functionVersion);
+    const showSurfaceContours = useStore((s) => s.showSurfaceContours);
+    const wireframe = useStore((s) => s.wireframe);
+    const shouldShowWireframe = wireframe && !showSurfaceContours;
 
     const SIZE = domainMax - domainMin;
     const SEGMENTS = gridLines;
@@ -58,22 +61,22 @@ export default function MountainSurface() {
                     opacity={0.76}
                     roughness={0.52}
                     metalness={0.40}
-                    emissive="#041725"
+                    emissive="#065563"
                     emissiveIntensity={2}
+                    wireframe={wireframe}
                 />
             </mesh>
-            {/*Wireframe overlay
-
-            <mesh geometry={geometry}>
-                <meshBasicMaterial
-                    color= "#2fc8f6"
-                    wireframe
-                    transparent
-                    opacity={0.50}
-                    toneMapped={false}
-                />
-            </mesh>
-            */}
+            {shouldShowWireframe && (
+                <mesh geometry={geometry}>
+                    <meshBasicMaterial
+                        wireframe
+                        color="#2fc8f6"
+                        transparent
+                        opacity={0.5}
+                        toneMapped={false}
+                    />
+                </mesh>
+            )}
         </group>
     );
 }

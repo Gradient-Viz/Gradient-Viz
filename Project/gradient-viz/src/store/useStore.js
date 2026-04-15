@@ -22,7 +22,7 @@ const useStore = createWithEqualityFn((set) => ({
     vrUIPanelRotation: [0,0,0],
     vrLeftGripActive: false,
     vrRightGripActive: false,
-
+    wireframe: true,
 
     //Actions
     setViewMode: (mode) => set({viewMode: mode}),
@@ -57,6 +57,7 @@ const useStore = createWithEqualityFn((set) => ({
     setVRLeftGripActive: (active) => set({vrLeftGripActive: active}),
     setVRRightGripActive: (active) => set({vrRightGripActive: active}),
     setVRUIVisible: (visible) => set({vrUIVisible: visible}),
+    setWireframe: (val) => set({ wireframe: val}),
 
     reset: () => set({
         viewMode: '3d_explore',

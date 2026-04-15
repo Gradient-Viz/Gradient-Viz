@@ -33,6 +33,8 @@ export default function UIOverlay() {
     const setDomainHalfRange = useStore((s) => s.setDomainHalfRange);
     const interactionMode = useStore((s) => s.interactionMode);
     const setInteractionMode = useStore((s) => s.setInteractionMode);
+    const wireframe = useStore((s) => s.wireframe);
+    const setWireframe = useStore((s) => s.setWireframe);
 
     const [funcText, setFuncText] = useState('(7*x*y)/exp(x^2+y^2)');
     const [funcError, setFuncError] = useState(false);
@@ -155,6 +157,13 @@ export default function UIOverlay() {
                             onClick={toggleSurfaceContours}
                         >
                             Surface Contours
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${wireframe ? 'active' : ''}`}
+                            onClick={() => setWireframe(!wireframe)}
+                        >
+                            {wireframe ? 'Show Wireframe' : 'Hide Wireframe'}
                             <span className="toggle-dot" />
                         </button>
                         <button
