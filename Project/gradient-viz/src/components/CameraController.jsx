@@ -94,7 +94,7 @@ export default function CameraController(){
             window.removeEventListener('keyup', handleKeyUp);
         };
       
-    }, [viewMode, camera, personPosition]);
+    }, [viewMode]);
 
 
     useEffect(() => {
