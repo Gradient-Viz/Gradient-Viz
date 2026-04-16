@@ -9,6 +9,7 @@ export default function MountainSurface() {
     const gridLines = useStore((s) => s.gridLines);
     const functionVersion = useStore((s) => s.functionVersion);
     const showSurfaceContours = useStore((s) => s.showSurfaceContours);
+    const showSurface = useStore((s) => s.showSurface);
     const wireframe = useStore((s) => s.wireframe);
     const shouldShowWireframe = wireframe && !showSurfaceContours;
 
@@ -50,6 +51,7 @@ export default function MountainSurface() {
 
     }, [SIZE, SEGMENTS, functionVersion]);
     // make y = z
+    if (!showSurface) return null;
     return (
         <group>
             {/*Solid semi-trans surface */}

@@ -20,6 +20,8 @@ export default function UIOverlay() {
     const setSurfacePathProgress = useStore((s) => s.setSurfacePathProgress);
     const toggleGroundContours = useStore((s) => s.toggleGroundContours);
     const toggleSurfaceContours = useStore((s) => s.toggleSurfaceContours);
+    const toggleSurface = useStore((s) => s.toggleSurface);
+    const showSurface = useStore((s) => s.showSurface);
     const showGroundContours = useStore((s) => s.showGroundContours);
     const showSurfaceContours = useStore((s) => s.showSurfaceContours);
     const reset = useStore((s) => s.reset);
@@ -145,6 +147,13 @@ export default function UIOverlay() {
                 <div className="section-card">
                     <span className="section-label">Display</span>
                     <div className="btn-group">
+                        <button 
+                            className={`btn-toggle ${showSurface ? 'active' : ''}`}
+                            onClick={toggleSurface}
+                        >
+                            {showSurface ? 'Surface Graph: On' : 'Surface Graph: Off'}
+                            <span className='toggle-dot'/>
+                        </button>
                         <button
                             className={`btn-toggle ${showGroundContours ? 'active' : ''}`}
                             onClick={toggleGroundContours}
