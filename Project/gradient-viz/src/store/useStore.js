@@ -12,10 +12,14 @@ const useStore = createWithEqualityFn((set) => ({
     domainMax: 6,
     vectorCount: 13,
     functionVersion: 0,
-    showGroundContours: false,
-    showSurfaceContours: true,
+    showGroundContoursA: false,
+    showGroundContoursB: false,
+    showSurfaceContoursA: true,
+    showSurfaceContoursB: true,
     showVectors: true,
-    showSurface: true,
+    showSurfaceA: true,
+    showSurfaceB: true,
+    showIntersectionCurve: true,
     interactionMode: "click",
     isVRsession: false,
     vrUIVisible: true,
@@ -47,10 +51,19 @@ const useStore = createWithEqualityFn((set) => ({
             personPosition: [clamp(px), clamp(py)],
         };
     }),
-    toggleGroundContours: () => set((s) => ({ showGroundContours: !s.showGroundContours })),
-    toggleSurfaceContours: () => set((s) =>  ({ showSurfaceContours: !s.showSurfaceContours })),
+    toggleGroundContoursA: () => set((s) => ({ showGroundContoursA: !s.showGroundContoursA })),
+    toggleGroundContoursB: () => set((s) => ({ showGroundContoursB: !s.showGroundContoursB })),
+    
+    toggleSurfaceContoursA: () => set((s) =>  ({ showSurfaceContoursA: !s.showSurfaceContoursA })),
+    toggleSurfaceContoursB: () => set((s) =>  ({ showSurfaceContoursB: !s.showSurfaceContoursB })),
+    
+    toggleIntersectionCurve: () => set((s) => ({showIntersectionCurve: !s.showIntersectionCurve })),
+    
     toggleVectors: () => set((s) => ({ showVectors: !s.showVectors })),
-    toggleSurface: () => set((s) =>  ({ showSurface: !s.showSurface })),
+    
+    toggleSurfaceA: () => set((s) =>  ({ showSurfaceA: !s.showSurfaceA })),
+    toggleSurfaceB: () => set((s) =>  ({ showSurfaceB: !s.showSurfaceB })),
+    
     setSurfacePathProgress: (progress) => set({surfacePathProgress: progress}),
     setInteractionMode: (mode) => set({interactionMode: mode}),
     setIsVRsession: (val) => set({ isVRsession: val}),

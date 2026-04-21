@@ -50,7 +50,8 @@ function App() {
             <directionalLight position={[6, 10, 5]} intensity={1.05} />
             <ambientLight intensity={0.32} />
 
-            <MountainSurface />
+            <MountainSurface fnKey='A'/>
+            <MountainSurface fnKey='B' />
             <ContourLines />
             <GradientArrows />
             <AscentPaths />
@@ -59,7 +60,7 @@ function App() {
             <PersonMarker />
             <CameraController />
             <DragPlane ref={dragPlaneRef} />
-            <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef} />(
+            <VRControllerInteraction dragPlaneRef={dragPlaneRef} panelRef={vrPanelRef} />
               <EffectComposer>
                 <Bloom
                   intensity={0.9}

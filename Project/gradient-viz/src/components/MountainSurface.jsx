@@ -1,17 +1,22 @@
 import { useMemo } from "react";
 import * as THREE from 'three';
-import { f } from '../utils/math';
+import { evaluateFunction } from '../utils/math';
 import useStore from "../store/useStore";
 
-export default function MountainSurface() {
+export default function MountainSurface({ fnKey = 'A' }) {
     const domainMin = useStore((s) => s.domainMin);
     const domainMax = useStore((s) => s.domainMax);
     const gridLines = useStore((s) => s.gridLines);
     const functionVersion = useStore((s) => s.functionVersion);
-    const showSurfaceContours = useStore((s) => s.showSurfaceContours);
-    const showSurface = useStore((s) => s.showSurface);
+
     const wireframe = useStore((s) => s.wireframe);
+    
+
+    const showSurfaceGraph = useStore((s) => (fnKey === 'B' ? s.showSurfaceB: s.showSurfaceA));
+    const showSurfaceContours = useStore((s) => (fnKey === 'B' ? s.showSurfaceContoursB : s.showSurfaceContoursA ));
     const shouldShowWireframe = wireframe && !showSurfaceContours;
+
+
 
     const SIZE = domainMax - domainMin;
     const SEGMENTS = gridLines;
@@ -25,7 +30,7 @@ export default function MountainSurface() {
         let fMin = Infinity, fMax = -Infinity;
 
         for(let i = 0; i < pos.count; i++){
-            const z = f(pos.getX(i), pos.getY(i));
+            const z = evaluateFunction(fnKey, pos.getX(i), pos.getY(i));
             if (z < fMin) fMin = z;
             if (z > fMax) fMax = z;
         }
@@ -33,25 +38,33 @@ export default function MountainSurface() {
         for (let i = 0; i < pos.count; i++){
             const x = pos.getX(i);
             const y = pos.getY(i);
-            const z = f(x,y);  // Compute height
+            const z = evaluateFunction(fnKey, x, y);  // Compute height
             
             pos.setX(i, x);
             pos.setY(i, z);
             pos.setZ(i, y); 
 
             const t = fMax > fMin ? (z-fMin) / (fMax - fMin): 0; // maps
-            colors[i*3] =0.02 + t * 0.08; // R
-            colors[i*3 + 1] =  0.05 + t * 0.15; // G
-            colors[i*3 + 2] =  0.1  + t * 0.2; // B
+
+            if (fnKey === 'B'){
+            colors[i * 3] = 0.02 + t * 0.20; // R
+            colors[i * 3 + 1] =  0.03 + t * 0.10; // G
+            colors[i * 3 + 2] =  0.10  + t * 0.18; // B
+            } else {
+                colors[i * 3] = 0.02 + t * 0.08; // R
+                colors[i * 3 + 1] =  0.05 + t * 0.15; // G
+                colors[i * 3 + 2] =  0.10  + t * 0.20; // B 
+            }
         }
 
         geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         geo.computeVertexNormals(); 
         return geo;
 
-    }, [SIZE, SEGMENTS, functionVersion]);
-    // make y = z
-    if (!showSurface) return null;
+    }, [SIZE, SEGMENTS, functionVersion, fnKey]);
+    
+    if(!showSurfaceGraph) return null;
+    
     return (
         <group>
             {/*Solid semi-trans surface */}
@@ -63,7 +76,7 @@ export default function MountainSurface() {
                     opacity={0.76}
                     roughness={0.52}
                     metalness={0.40}
-                    emissive="#065563"
+                    emissive={fnKey === 'B' ? '#501261' : '#065563'}
                     emissiveIntensity={2}
                     wireframe={wireframe}
                 />
@@ -72,7 +85,7 @@ export default function MountainSurface() {
                 <mesh geometry={geometry}>
                     <meshBasicMaterial
                         wireframe
-                        color="#2fc8f6"
+                        color={fnKey === 'B' ? "#f071ff" : '#2fc8f6'}
                         transparent
                         opacity={0.5}
                         toneMapped={false}

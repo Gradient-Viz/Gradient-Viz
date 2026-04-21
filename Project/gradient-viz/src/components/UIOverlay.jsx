@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import useStore from '../store/useStore';
 import douglasLogo from '../assets/logo.png';
-import { setUserFunction, f, gradient } from '../utils/math';
+import { setFunctionByKey, f, gradient } from '../utils/math';
 import './UIOverlay.css';
 import Contour2DPanel from './Contour2DPanel';
 
@@ -18,12 +18,28 @@ export default function UIOverlay() {
     const setShowAscentPath = useStore((s) => s.setShowAscentPath);
     const setAscentProgress = useStore((s) => s.setAscentProgress);
     const setSurfacePathProgress = useStore((s) => s.setSurfacePathProgress);
-    const toggleGroundContours = useStore((s) => s.toggleGroundContours);
-    const toggleSurfaceContours = useStore((s) => s.toggleSurfaceContours);
-    const toggleSurface = useStore((s) => s.toggleSurface);
-    const showSurface = useStore((s) => s.showSurface);
-    const showGroundContours = useStore((s) => s.showGroundContours);
-    const showSurfaceContours = useStore((s) => s.showSurfaceContours);
+
+    const toggleSurfaceA = useStore((s) => s.toggleSurfaceA);
+    const toggleSurfaceB = useStore((s) => s.toggleSurfaceB);
+    
+    const showSurfaceA = useStore((s) => s.showSurfaceA);
+    const showSurfaceB = useStore((s) => s.showSurfaceB);
+    
+    const showGroundContoursA = useStore((s) => s.showGroundContoursA);
+    const showGroundContoursB = useStore((s) => s.showGroundContoursB);
+    
+    const toggleGroundContoursA = useStore((s) => s.toggleGroundContoursA);
+    const toggleGroundContoursB = useStore((s) => s.toggleGroundContoursB);
+    
+    const toggleSurfaceContoursA = useStore((s) => s.toggleSurfaceContoursA);
+    const toggleSurfaceContoursB = useStore((s) => s.toggleSurfaceContoursB);
+
+    const showSurfaceContoursA = useStore((s) => s.showSurfaceContoursA);
+    const showSurfaceContoursB = useStore((s) => s.showSurfaceContoursB);
+
+    const showIntersectionCurve = useStore((s) => s.showIntersectionCurve);
+    const toggleIntersectionCurve = useStore((s) => s.toggleIntersectionCurve);
+
     const reset = useStore((s) => s.reset);
     const incrementFunctionVersion = useStore((s) => s.incrementFunctionVersion);
     const gridLines = useStore((s) => s.gridLines);
@@ -38,8 +54,11 @@ export default function UIOverlay() {
     const wireframe = useStore((s) => s.wireframe);
     const setWireframe = useStore((s) => s.setWireframe);
 
-    const [funcText, setFuncText] = useState('(7*x*y)/exp(x^2+y^2)');
-    const [funcError, setFuncError] = useState(false);
+    const [funcTextA, setFuncTextA] = useState('(7*x*y)/exp(x^2+y^2)');
+    const [funcAError, setFuncAError] = useState(false);
+    const [funcTextB, setFuncTextB] = useState('sin(x)*cos(y)');
+    const [funcBError, setFuncBError] = useState(false); 
+
     const [showSettings, setShowSettings] = useState(false);
     const [vectorCountText, setVectorCountText] = useState(String(vectorCount));
 
@@ -59,13 +78,20 @@ export default function UIOverlay() {
         return 'Mode: 3D Compare';
     }, [viewMode, showAscentPath, ascentProgress]);
 
-    const handleFunctionChange = (e) => {
-        setFuncText(e.target.value);
+
+    const handleApplyFunctionA = () => {
+        const success = setFunctionByKey('A', funcTextA);
+        setFuncAError(!success);
+        if (success) {
+            incrementFunctionVersion();
+            reset();
+            setSurfacePathProgress(0);
+        }
     };
 
-    const handleApplyFunction = () => {
-        const success = setUserFunction(funcText);
-        setFuncError(!success);
+    const handleApplyFunctionB = () => {
+        const success = setFunctionByKey('B', funcTextB);
+        setFuncBError(!success);
         if (success) {
             incrementFunctionVersion();
             reset();
@@ -120,24 +146,39 @@ export default function UIOverlay() {
 
             <div className="sidebar-scroll">
                 <div className="section-card">
-                    <span className="section-label">Function</span>
+                    <span className="section-label">Function A</span>
                     <p className="subtle-help">Use JavaScript math syntax for z = f(x, y).</p>
                     <input
-                        className={`func-input ${funcError ? 'error' : ''}`}
-                        value={funcText}
-                        onChange={handleFunctionChange}
-                        onKeyDown={(e) => e.key === 'Enter' && handleApplyFunction()}
+                        className={`func-input ${funcAError ? 'error' : ''}`}
+                        value={funcTextA}
+                        onChange={(e) => setFuncTextA(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyFunctionA()}
                     />
-                    <button className="btn-primary" onClick={handleApplyFunction}>
-                        Update Surface
+                    <button className="btn-primary" onClick={handleApplyFunctionA}>
+                        Update function A
                     </button>
-                    {funcError && (
+                    {funcAError && (
                         <p className="func-error">
                             Invalid function. Try expressions like: sin(x)*cos(y), exp(-0.2*(x^2+y^2)).
                         </p>
                     )}
+                    <p className='subtle-help'>Function B (comparison surface/contours)</p>
+                    <input
+                        className={`func-input ${funcBError ? 'error' : ''}`}
+                        value={funcTextB}
+                        onChange={(e) => setFuncTextB(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyFunctionB()}
+                    />
+                    <button className="btn-primary" onClick={handleApplyFunctionB}>
+                        Update function B
+                    </button>
+                    {funcBError && (
+                        <p className="func-error">
+                            Invalid function. Try expressions like: sin(x)*cos(y), exp(-0.2*(x^2+y^2)).
+                        </p> 
+                    )}
                 </div>
-
+                
                 <div className="section-card">
                     <span className="section-label">2D Contour Map</span>
                     <p className="subtle-help">Click or drag inside the map to reposition the explorer.</p>
@@ -148,24 +189,52 @@ export default function UIOverlay() {
                     <span className="section-label">Display</span>
                     <div className="btn-group">
                         <button 
-                            className={`btn-toggle ${showSurface ? 'active' : ''}`}
-                            onClick={toggleSurface}
+                            className={`btn-toggle ${showSurfaceA ? 'active' : ''}`}
+                            onClick={toggleSurfaceA}
                         >
-                            {showSurface ? 'Surface Graph: On' : 'Surface Graph: Off'}
+                            {showSurfaceA ? 'Surface A: On' : 'Surface A: Off'}
+                            <span className='toggle-dot'/>
+                        </button>
+                        <button 
+                            className={`btn-toggle ${showSurfaceB ? 'active' : ''}`}
+                            onClick={toggleSurfaceB}
+                        >
+                            {showSurfaceB ? 'Surface B: On' : 'Surface B: Off'}
                             <span className='toggle-dot'/>
                         </button>
                         <button
-                            className={`btn-toggle ${showGroundContours ? 'active' : ''}`}
-                            onClick={toggleGroundContours}
+                            className={`btn-toggle ${showGroundContoursA ? 'active' : ''}`}
+                            onClick={toggleGroundContoursA}
                         >
-                            Ground Contours
+                            Ground Contours A
                             <span className="toggle-dot" />
                         </button>
                         <button
-                            className={`btn-toggle ${showSurfaceContours ? 'active' : ''}`}
-                            onClick={toggleSurfaceContours}
+                            className={`btn-toggle ${showGroundContoursB ? 'active' : ''}`}
+                            onClick={toggleGroundContoursB}
                         >
-                            Surface Contours
+                            Ground Contours B
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${showSurfaceContoursA ? 'active' : ''}`}
+                            onClick={toggleSurfaceContoursA}
+                        >
+                            Surface Contours A
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${showSurfaceContoursB ? 'active' : ''}`}
+                            onClick={toggleSurfaceContoursB}
+                        >
+                            Surface Contours B
+                            <span className="toggle-dot" />
+                        </button>
+                        <button
+                            className={`btn-toggle ${showIntersectionCurve ? 'active' : ''}`}
+                            onClick={toggleIntersectionCurve}
+                        >
+                            Intersection Curve
                             <span className="toggle-dot" />
                         </button>
                         <button
